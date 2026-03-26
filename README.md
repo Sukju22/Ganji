@@ -31,8 +31,3 @@
 - 단, 저작권 표시(이 README 포함)는 유지해야 합니다.
 
 ---
-
-## 참고
-- HTML, CSS, JavaScript 기초 학습용  
-- GitHub Pages 실습용  
-- 포트폴리오용 예제 페이지로도 사용 가능
