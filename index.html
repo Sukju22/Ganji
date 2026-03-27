@@ -1892,70 +1892,193 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
     const existing = document.getElementById("yearDropList");
     if (existing) { existing.remove(); return; }
 
-    let baseYear = internalYear;
+    // ── 아이템 높이: 이전 방식과 동일 (padding 4px × 2 + 폰트)
+    const ITEM_H  = 26;   // px — padding:4px 12px 기준
+    const VISIBLE = 11;   // 표시 항목 수 (-5 ~ +5)
+    const CENTER  = 100;  // 배열 중앙 인덱스
 
+    // ── 60년 단위 연도 배열 생성
+    function makeYears(centerYear) {
+      const cy = toAstronomicalYear(closestGapjaYear(centerYear));
+      const arr = [];
+      for (let i = -CENTER; i <= CENTER; i++) {
+        arr.push(fromAstronomicalYear(cy + i * 60));
+      }
+      return arr;
+    }
+
+    let years     = makeYears(internalYear);
+    let centerIdx = CENTER;
+
+    // ── 외부 wrapper (fixed 위치) — 이전과 동일한 스타일
     const list = document.createElement("div");
     list.id = "yearDropList";
-    list.style.cssText = `
-      position: fixed;
-      background: rgba(0,0,0,0.9);
-      color: #fff;
-      border-radius: 4px;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
-      z-index: 99999;
-      font-family: var(--g3-yearinput-font-family);
-      font-size: var(--g3-yearinput-font-size);
-      overflow: hidden;
-      min-width: 80px;
-    `;
-
-    buildYearList(list, baseYear);
-
-    // 위치: yearDropdown 셀 아래
     const rect = yearDropdown.getBoundingClientRect();
-    list.style.left = rect.left + "px";
-    list.style.top  = rect.bottom + "px";
+    const listH = ITEM_H * VISIBLE;
+    list.style.cssText = [
+      "position:fixed",
+      "z-index:99999",
+      "border-radius:4px",
+      "box-shadow:2px 2px 6px rgba(0,0,0,0.4)",
+      "overflow:hidden",
+      "min-width:80px",
+      `width:${Math.max(rect.width, 80)}px`,
+      `height:${listH}px`,
+      `left:${rect.left}px`,
+      `top:${rect.bottom}px`,
+      "background:rgba(0,0,0,0.9)",
+    ].join(";");
+
+    // ── 스크롤 내부 컨테이너
+    const inner = document.createElement("div");
+    inner.style.cssText = [
+      "position:absolute",
+      "top:0","left:0","right:0",
+      `height:${ITEM_H * years.length}px`,
+    ].join(";");
+
+    // ── 아이템 생성 — 이전 buildYearList 스타일과 동일
+    function makeItem(yr, idx) {
+      const item = document.createElement("div");
+      item.dataset.yr  = yr;
+      item.dataset.idx = idx;
+      const isCtr = (idx === centerIdx);
+      item.style.cssText = [
+        `height:${ITEM_H}px`,
+        "display:flex","align-items:center","justify-content:center",
+        "padding:4px 12px",
+        "box-sizing:border-box",
+        "white-space:nowrap",
+        "cursor:pointer",
+        "text-align:center",
+        `font-size:var(--g3-yearinput-font-size)`,
+        `font-family:var(--g3-yearinput-font-family)`,
+        `font-weight:${isCtr ? "bold" : "normal"}`,
+        `background:${isCtr ? "rgba(255,255,255,0.2)" : "transparent"}`,
+        `color:${yr <= 0 ? "var(--color-text-red)" : "#fff"}`,
+        "user-select:none",
+        "-webkit-user-select:none",
+      ].join(";");
+      item.textContent = yr <= 0 ? Math.abs(yr) : yr;
+      return item;
+    }
+
+    years.forEach((yr, idx) => inner.appendChild(makeItem(yr, idx)));
+    list.appendChild(inner);
     document.body.appendChild(list);
 
-    // 휠 스크롤 — 위아래 이동 시 목록 재생성
-    list.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      const step = e.deltaY > 0 ? 1 : -1;
-      const next = fromAstronomicalYear(toAstronomicalYear(baseYear) + step * 60);
-      baseYear = closestGapjaYear(next); // 항상 갑자년으로 고정
-      if (baseYear > 2025) baseYear = closestGapjaYear(2025);
-      if (baseYear < -999) baseYear = closestGapjaYear(-999);
-      buildYearList(list, baseYear);
-    }, { passive: false });
+    // ── 초기 스크롤: 중앙 아이템이 목록 가운데 오도록
+    function scrollToCenter(animate) {
+      const targetTop = centerIdx * ITEM_H - Math.floor(VISIBLE / 2) * ITEM_H;
+      inner.style.transition = animate ? "top 0.15s ease" : "none";
+      inner.style.top = -targetTop + "px";
+    }
+    scrollToCenter(false);
 
-    // 터치 스와이프 스크롤 — 위아래 드래그 시 목록 재생성
+    // ── 중앙 강조 갱신
+    function refreshHighlight() {
+      inner.querySelectorAll("[data-idx]").forEach(el => {
+        const idx = parseInt(el.dataset.idx);
+        const yr  = parseInt(el.dataset.yr);
+        const isCtr = (idx === centerIdx);
+        el.style.fontWeight = isCtr ? "bold" : "normal";
+        el.style.background = isCtr ? "rgba(255,255,255,0.2)" : "transparent";
+      });
+    }
+
+    // ── 인덱스 이동 (경계 처리 + 재생성)
+    function moveCenter(delta) {
+      const newIdx = centerIdx + delta;
+      if (newIdx < 0 || newIdx >= years.length) return;
+      // 배열 끝 5개 이내면 확장
+      if (newIdx < 5) {
+        const first = toAstronomicalYear(years[0]);
+        const added = [];
+        for (let i = 10; i >= 1; i--) {
+          const y = fromAstronomicalYear(first - i * 60);
+          if (y >= -999) added.push(y);
+        }
+        if (added.length) {
+          const newItems = added.map((yr, i) => makeItem(yr, i));
+          added.forEach((yr, i) => {
+            const item = makeItem(yr, i);
+            inner.insertBefore(item, inner.firstChild);
+          });
+          // 인덱스 전체 재조정
+          Array.from(inner.children).forEach((el, i) => {
+            el.dataset.idx = i;
+          });
+          years = added.concat(years);
+          centerIdx += added.length;
+          inner.style.height = `${ITEM_H * years.length}px`;
+        }
+      }
+      if (newIdx >= years.length - 5) {
+        const last = toAstronomicalYear(years[years.length - 1]);
+        for (let i = 1; i <= 10; i++) {
+          const y = fromAstronomicalYear(last + i * 60);
+          if (y <= 2025) {
+            const item = makeItem(y, years.length);
+            inner.appendChild(item);
+            years.push(y);
+          }
+        }
+        inner.style.height = `${ITEM_H * years.length}px`;
+        Array.from(inner.children).forEach((el, i) => { el.dataset.idx = i; });
+      }
+      centerIdx += delta;
+      refreshHighlight();
+      scrollToCenter(true);
+    }
+
+    // ── 클릭/탭으로 선택
+    inner.addEventListener("click", function(e) {
+      const item = e.target.closest("[data-idx]");
+      if (!item) return;
+      const yr = parseInt(item.dataset.yr);
+      updateYearInput(yr);
+      list.remove();
+    });
+
+    // ── 터치 스와이프
     let touchStartY = 0;
     let touchLastY  = 0;
     let touchAccum  = 0;
-    const TOUCH_STEP_PX = 40;
-    list.addEventListener("touchstart", (e) => {
+    const TOUCH_PX_PER_STEP = ITEM_H; // 1 아이템 높이만큼 드래그하면 1 step
+
+    list.addEventListener("touchstart", function(e) {
       touchStartY = e.touches[0].clientY;
       touchLastY  = touchStartY;
       touchAccum  = 0;
-    }, { passive: true });
-    list.addEventListener("touchmove", (e) => {
+      inner.style.transition = "none";
+    }, { passive: false });
+
+    list.addEventListener("touchmove", function(e) {
       e.preventDefault();
       const y    = e.touches[0].clientY;
-      const diff = touchLastY - y;
+      const diff = touchLastY - y;   // 위로 올리면 양수
       touchLastY = y;
       touchAccum += diff;
-      const steps = Math.trunc(touchAccum / TOUCH_STEP_PX);
+      const steps = Math.trunc(touchAccum / TOUCH_PX_PER_STEP);
       if (steps !== 0) {
-        touchAccum -= steps * TOUCH_STEP_PX;
-        const next = fromAstronomicalYear(toAstronomicalYear(baseYear) + steps * 60);
-        baseYear = closestGapjaYear(next);
-        if (baseYear > 2025) baseYear = closestGapjaYear(2025);
-        if (baseYear < -999) baseYear = closestGapjaYear(-999);
-        buildYearList(list, baseYear);
+        touchAccum -= steps * TOUCH_PX_PER_STEP;
+        moveCenter(steps);
       }
     }, { passive: false });
 
-    // 외부 클릭/터치 시 닫기
+    list.addEventListener("touchend", function(e) {
+      // snap: 가장 가까운 아이템으로 정렬
+      scrollToCenter(true);
+    }, { passive: true });
+
+    // ── 휠 스크롤 (데스크탑)
+    list.addEventListener("wheel", function(e) {
+      e.preventDefault();
+      const step = e.deltaY > 0 ? 1 : -1;
+      moveCenter(step);
+    }, { passive: false });
+
+    // ── 외부 클릭/터치 시 닫기
     setTimeout(() => {
       function handler(ev) {
         if (!list.contains(ev.target) && ev.target !== yearDropdown) {
