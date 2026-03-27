@@ -1898,18 +1898,29 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
     const existing = document.getElementById("yearDropList");
     if (existing) { existing.remove(); return; }
 
-    const ITEM_H  = 26;    // 이전과 동일한 아이템 높이
-    const VISIBLE = 11;    // 보이는 항목 수
-    const STEP    = 60;    // 60년 단위
-    const PRELOAD = 100;   // 현재년부터 과거로 100개
+    const ITEM_H  = 26;   // 아이템 높이
+    const VISIBLE = 11;   // 보이는 항목 수
+    const STEP    = 60;   // 60년 단위
+    // 목록 기준: 1444 기준으로 미래 5개 + 과거 전체 (총 ~55개)
+    const BASE    = 1444; // G3C2 기본 표시값
+    const FUTURE  = 5;    // 기준보다 미래 방향 항목 수
 
-    // ── 아이템 배열 생성 (현재년 ~ 과거 100개)
-    const cy = toAstronomicalYear(closestGapjaYear(internalYear));
+    // ── 아이템 배열: BASE 기준 미래 FUTURE개 ~ 과거 끝(-999)까지
+    const baseAstro = toAstronomicalYear(closestGapjaYear(BASE));
     const years = [];
-    for (let i = 0; i < PRELOAD; i++) {
-      years.push(fromAstronomicalYear(cy - i * STEP));
+    // 미래쪽 (위에 표시)
+    for (let i = FUTURE; i >= 1; i--) {
+      const y = fromAstronomicalYear(baseAstro + i * STEP);
+      if (y <= 2025) years.push(y);
     }
-    const centerIdx = 0; // 현재년이 맨 위 (인덱스 0)
+    // BASE 포함 과거쪽
+    for (let i = 0; ; i++) {
+      const y = fromAstronomicalYear(baseAstro - i * STEP);
+      if (y < -999) break;
+      years.push(y);
+    }
+    // BASE(1444)의 인덱스
+    const baseIdx = years.findIndex(y => y === closestGapjaYear(BASE));
 
     // ── 외부 컨테이너 (overflow-y: auto → 네이티브 스크롤)
     const list = document.createElement("div");
@@ -1928,15 +1939,14 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       "border-radius:4px",
       "box-shadow:2px 2px 6px rgba(0,0,0,0.4)",
       "z-index:99999",
-      "scrollbar-width:none",   /* Firefox 스크롤바 숨김 */
+      "scrollbar-width:none",
     ].join(";");
-    /* Chrome/Safari 스크롤바 숨김 */
     list.insertAdjacentHTML("afterbegin",
       "<style>#yearDropList::-webkit-scrollbar{display:none}</style>");
 
     // ── 아이템 생성
     years.forEach((yr, idx) => {
-      const isCtr = (idx === centerIdx);
+      const isBase = (idx === baseIdx);
       const item = document.createElement("div");
       item.dataset.yr = yr;
       item.style.cssText = [
@@ -1949,46 +1959,62 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         "text-align:center",
         "font-size:var(--g3-yearinput-font-size)",
         "font-family:var(--g3-yearinput-font-family)",
-        `font-weight:${isCtr ? "bold" : "normal"}`,
-        `background:${isCtr ? "rgba(255,255,255,0.2)" : "transparent"}`,
+        `font-weight:${isBase ? "bold" : "normal"}`,
+        `background:${isBase ? "rgba(255,255,255,0.2)" : "transparent"}`,
         `color:${yr <= 0 ? "var(--color-text-red)" : "#fff"}`,
         "user-select:none",
         "-webkit-user-select:none",
       ].join(";");
       item.textContent = yr <= 0 ? Math.abs(yr) : yr;
 
-      // 호버
       item.addEventListener("mouseenter", () => {
         item.style.background = "rgba(255,255,255,0.2)";
       });
       item.addEventListener("mouseleave", () => {
-        item.style.background =
-          (idx === centerIdx) ? "rgba(255,255,255,0.2)" : "transparent";
+        item.style.background = isBase ? "rgba(255,255,255,0.2)" : "transparent";
       });
 
-      // 탭/클릭으로 선택
-      function selectYear(e) {
-        e.preventDefault();
+      // 클릭/탭으로 선택
+      item.addEventListener("click", function(e) {
         e.stopPropagation();
         updateYearInput(yr);
         list.remove();
-      }
-      item.addEventListener("click", selectYear);
-      item.addEventListener("touchend", selectYear);
+      });
+      // 터치: 스크롤과 탭 구분 — touchstart~touchend 이동 거리가 짧을 때만 선택
+      let tStartY = 0;
+      item.addEventListener("touchstart", function(e) {
+        tStartY = e.touches[0].clientY;
+      }, { passive: true });
+      item.addEventListener("touchend", function(e) {
+        const dy = Math.abs(e.changedTouches[0].clientY - tStartY);
+        if (dy < 8) { // 8px 미만이면 탭으로 간주
+          e.preventDefault();
+          e.stopPropagation();
+          updateYearInput(yr);
+          list.remove();
+        }
+      });
 
       list.appendChild(item);
     });
 
     document.body.appendChild(list);
 
-    // ── 초기 스크롤 위치: 현재년(맨 위)이 보이도록
-    list.scrollTop = 0;
+    // ── 초기 스크롤: 1444가 목록 세로 가운데에 오도록
+    if (baseIdx >= 0) {
+      list.scrollTop = baseIdx * ITEM_H - Math.floor(VISIBLE / 2) * ITEM_H;
+    }
 
-    // ── 외부 클릭/터치 시 닫기
-    // 터치: touchmove 중에는 닫히지 않도록 스크롤 중 플래그 사용
-    let isScrolling = false;
-    list.addEventListener("touchmove", () => { isScrolling = true; }, { passive: true });
-    list.addEventListener("touchstart", () => { isScrolling = false; }, { passive: true });
+    // ── 외부 닫기: mousedown(PC) + touchend(터치)
+    // 터치 스크롤 후 손가락을 뗄 때 닫히지 않도록
+    // list 자체의 scroll 이벤트로 플래그 관리 (touchmove보다 안정적)
+    let justScrolled = false;
+    let scrollTimer = null;
+    list.addEventListener("scroll", () => {
+      justScrolled = true;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => { justScrolled = false; }, 400);
+    }, { passive: true });
 
     setTimeout(() => {
       function mouseHandler(ev) {
@@ -1998,7 +2024,7 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         }
       }
       function touchHandler(ev) {
-        if (isScrolling) return; // 스크롤 중이면 무시
+        if (justScrolled) return; // 스크롤 직후이면 무시
         if (!list.contains(ev.target) && ev.target !== yearDropdown) {
           list.remove();
           document.removeEventListener("touchend", touchHandler);
@@ -2006,7 +2032,7 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       }
       document.addEventListener("mousedown", mouseHandler);
       document.addEventListener("touchend", touchHandler);
-    }, 300); // 열리는 터치 이벤트와 겹치지 않도록 300ms 지연
+    }, 400);
   }
 
   yearDropdown.addEventListener("click", showYearDropdown);
