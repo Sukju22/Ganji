@@ -1985,17 +1985,28 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
     list.scrollTop = 0;
 
     // ── 외부 클릭/터치 시 닫기
+    // 터치: touchmove 중에는 닫히지 않도록 스크롤 중 플래그 사용
+    let isScrolling = false;
+    list.addEventListener("touchmove", () => { isScrolling = true; }, { passive: true });
+    list.addEventListener("touchstart", () => { isScrolling = false; }, { passive: true });
+
     setTimeout(() => {
-      function handler(ev) {
+      function mouseHandler(ev) {
         if (!list.contains(ev.target) && ev.target !== yearDropdown) {
           list.remove();
-          document.removeEventListener("mousedown", handler);
-          document.removeEventListener("touchstart", handler);
+          document.removeEventListener("mousedown", mouseHandler);
         }
       }
-      document.addEventListener("mousedown", handler);
-      document.addEventListener("touchstart", handler);
-    }, 0);
+      function touchHandler(ev) {
+        if (isScrolling) return; // 스크롤 중이면 무시
+        if (!list.contains(ev.target) && ev.target !== yearDropdown) {
+          list.remove();
+          document.removeEventListener("touchend", touchHandler);
+        }
+      }
+      document.addEventListener("mousedown", mouseHandler);
+      document.addEventListener("touchend", touchHandler);
+    }, 300); // 열리는 터치 이벤트와 겹치지 않도록 300ms 지연
   }
 
   yearDropdown.addEventListener("click", showYearDropdown);
