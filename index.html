@@ -884,7 +884,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box h05" id="G1C4" style="cursor:pointer; color:var(--g1-color);">치세L1</div>
     <div class="box h05" id="G1C5" style="cursor:pointer; color:var(--g1-color-inactive);">단기</div>
     <div class="box h05" id="G1C6" style="cursor:pointer; color:var(--g1-color);">상단</div>
-    <div class="box h05" id="G1C7" style="cursor:pointer; color:var(--g1-color);">漢한D</div>
+    <div class="box h05" id="G1C7" style="cursor:pointer; color:var(--g1-color);">漢한M</div>
     <div class="box h05"></div>
     <div class="box h05"></div>
     <div class="box h05" id="G1C10" style="cursor:pointer; color:var(--g1-color);">사용폰트</div>
@@ -997,7 +997,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box c1 g7-year" id="G7R2C4" contenteditable="true" tabindex="4"></div>
     <div class="box label c1" id="G7R2C5"></div>
     <div class="box c1 g7-year" id="G7R2C6" contenteditable="true" tabindex="6"></div>
-    <div class="box label c1" id="G7R2C7" style="font-size:8px;">나이입력</div>
+    <div class="box label c1" id="G7R2C7">향년</div>
     <div class="box c1 g7-year" id="G7R2C8" contenteditable="true" tabindex="8"></div>
     <div class="box c1" id="G7R2C9" style="background:#FAC090;"></div>
     <div class="box c1 g7-year" id="G7R2C10" contenteditable="true" tabindex="10"></div>
@@ -2887,7 +2887,7 @@ if (G1C4) G1C4.style.color = "var(--g1-color-inactive)";
 // ── M모드(漢한M): G7R3C1 클릭으로 漢(한자만) ↔ 한(한글만) 2자 표시
 const G7_DISPLAY_OPTIONS = ["漢한", "한漢", "漢", "한"]; // D모드 순환 옵션
 window.g7DisplayMode = 0;  // D모드 초기값: 漢한
-window.g7MMode = false;    // false=D모드, true=M모드
+window.g7MMode = true;     // false=D모드, true=M모드
 window.g7MModeChar = "漢"; // M모드 현재 표시 글자 (漢 or 한)
 
 const G7R3C1El = document.getElementById("G7R3C1");
@@ -3078,7 +3078,19 @@ function yearToGanjiShort(year) {
   let y = year <= 0 ? year + 1 : year;
   const ganIdx  = ((y - 4) % 10 + 10) % 10;
   const jibiIdx = ((y - 4) % 12 + 12) % 12;
-  return gans_kor[ganIdx] + jibis_kor[jibiIdx]; // 앞 2글자(한글)만
+  const han = gans[ganIdx]     + jibis[jibiIdx];
+  const kor = gans_kor[ganIdx] + jibis_kor[jibiIdx];
+  // 모바일(.short)도 현재 표기방식 모드를 반영
+  if (window.g7MMode) {
+    return window.g7MModeChar === "漢" ? han : kor;
+  }
+  switch (window.g7DisplayMode) {
+    case 0: return han + kor; // 漢한
+    case 1: return kor + han; // 한漢
+    case 2: return han;       // 漢
+    case 3: return kor;       // 한
+    default: return kor;
+  }
 }
 
 // G7 셀 쌍 정의: [홀수(간지) id, 짝수(년도) id]
