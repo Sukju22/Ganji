@@ -884,7 +884,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box h05" id="G1C4" style="cursor:pointer; color:var(--g1-color);">치세L1</div>
     <div class="box h05" id="G1C5" style="cursor:pointer; color:var(--g1-color-inactive);">단기</div>
     <div class="box h05" id="G1C6" style="cursor:pointer; color:var(--g1-color);">상단</div>
-    <div class="box h05"></div>
+    <div class="box h05" id="G1C7" style="cursor:pointer; color:var(--g1-color);">漢한D</div>
     <div class="box h05"></div>
     <div class="box h05"></div>
     <div class="box h05" id="G1C10" style="cursor:pointer; color:var(--g1-color);">사용폰트</div>
@@ -2883,9 +2883,12 @@ updateG6BadgePosition();
 if (G1C4) G1C4.style.color = "var(--g1-color-inactive)";
 
 // ===== G7 홀수 셀 표기방식 =====
-// 옵션: 0=漢, 1=한, 2=漢한, 3=한漢
-const G7_DISPLAY_OPTIONS = ["漢", "한", "漢한", "한漢"];
-window.g7DisplayMode = 2; // 초기값: 漢한
+// ── D모드(漢한D): 옵션 0=漢한, 1=한漢, 2=漢, 3=한  (G7R3C1 클릭으로 순환)
+// ── M모드(漢한M): G7R3C1 클릭으로 漢(한자만) ↔ 한(한글만) 2자 표시
+const G7_DISPLAY_OPTIONS = ["漢한", "한漢", "漢", "한"]; // D모드 순환 옵션
+window.g7DisplayMode = 0;  // D모드 초기값: 漢한
+window.g7MMode = false;    // false=D모드, true=M모드
+window.g7MModeChar = "漢"; // M모드 현재 표시 글자 (漢 or 한)
 
 const G7R3C1El = document.getElementById("G7R3C1");
 
@@ -2895,41 +2898,53 @@ function getG7GanjiText(year) {
   const jibiIdx = ((y - 4) % 12 + 12) % 12;
   const han  = gans[ganIdx]     + jibis[jibiIdx];
   const kor  = gans_kor[ganIdx] + jibis_kor[jibiIdx];
+  if (window.g7MMode) {
+    // M모드: 漢→한자 2자만, 한→한글 2자만
+    return window.g7MModeChar === "漢" ? han : kor;
+  }
   switch (window.g7DisplayMode) {
-    case 0: return han;
-    case 1: return kor;
-    case 2: return han + kor;
-    case 3: return kor + han;
+    case 0: return han + kor;
+    case 1: return kor + han;
+    case 2: return han;
+    case 3: return kor;
   }
 }
 
 function updateG7R3C1() {
-  if (G7R3C1El) G7R3C1El.textContent = G7_DISPLAY_OPTIONS[window.g7DisplayMode];
+  if (!G7R3C1El) return;
+  if (window.g7MMode) {
+    G7R3C1El.textContent = window.g7MModeChar; // 漢 or 한
+  } else {
+    G7R3C1El.textContent = G7_DISPLAY_OPTIONS[window.g7DisplayMode];
+  }
 }
 
 function updateG7OddCellFontSize() {
   const g6FontSize = getComputedStyle(document.documentElement).getPropertyValue("--g6-font-size").trim();
   const g7FontSize = getComputedStyle(document.documentElement).getPropertyValue("--g7-font-size").trim();
 
-  /* G7R3C1 글자수 확인 — 1자(漢/한): G6폰트, 2자(漢한/한漢): 10px */
+  /* G7R3C1 글자수 확인 */
   const r3c1Text = G7R3C1El ? G7R3C1El.textContent.trim() : "";
   const charLen = r3c1Text.length;
 
-  /* 간지 셀 글자수: 漢한/한漢 모드면 한자2+한글2 = 4글자 */
+  /* M모드: 2자(한자 or 한글)만 → G6 폰트 크기
+     D모드: 1자(漢/한) → G6, 2자(漢한/한漢) → 10px, 기타 → 8px */
   let fontSize;
-  if (charLen === 1) {
-    fontSize = g6FontSize;   /* 1자: G6 폰트 크기 */
+  if (window.g7MMode) {
+    fontSize = g6FontSize;  // M모드는 항상 2자이므로 G6 폰트
+  } else if (charLen <= 1) {
+    fontSize = g6FontSize;
   } else if (charLen === 2) {
-    fontSize = "10px";       /* 2자: 10px */
+    fontSize = "10px";
   } else {
-    fontSize = "8px";        /* 4자: 8px */
+    fontSize = "8px";
   }
 
   G7OddCellIds.forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.style.fontSize = fontSize;
-    el.style.fontWeight = "normal"; /* 볼드 없음 */
+    el.style.fontWeight = "normal";
   });
 }
 
@@ -3013,7 +3028,13 @@ G7OddCellIds.forEach(id => {
 // G7R3C1 클릭 → 표기방식 변경
 if (G7R3C1El) {
   G7R3C1El.addEventListener("click", function() {
-    window.g7DisplayMode = (window.g7DisplayMode + 1) % 4;
+    if (window.g7MMode) {
+      // M모드: 漢 ↔ 한 번갈아
+      window.g7MModeChar = (window.g7MModeChar === "漢") ? "한" : "漢";
+    } else {
+      // D모드: 기존 4단계 순환
+      window.g7DisplayMode = (window.g7DisplayMode + 1) % 4;
+    }
     updateG7R3C1();
     refreshG7GanjiCells();
   });
@@ -3021,6 +3042,28 @@ if (G7R3C1El) {
 
 updateG7R3C1();
 updateG7OddCellFontSize(); /* 초기 폰트 사이즈 적용 */
+
+// ===== G1C7 漢한M / 漢한D 모드 토글 =====
+(function() {
+  const G1C7 = document.getElementById("G1C7");
+  if (!G1C7) return;
+
+  function updateG1C7Label() {
+    G1C7.textContent = window.g7MMode ? "漢한M" : "漢한D";
+  }
+  updateG1C7Label();
+
+  G1C7.addEventListener("click", function() {
+    window.g7MMode = !window.g7MMode;
+    if (window.g7MMode) {
+      // M모드 진입: 초기 글자 漢으로 설정
+      window.g7MModeChar = "漢";
+    }
+    updateG1C7Label();
+    updateG7R3C1();
+    refreshG7GanjiCells();
+  });
+})();
 
 // ===== G7 간지 변환 유틸 =====
 
