@@ -997,7 +997,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box c1 g7-year" id="G7R2C4" contenteditable="true" tabindex="4"></div>
     <div class="box label c1" id="G7R2C5"></div>
     <div class="box c1 g7-year" id="G7R2C6" contenteditable="true" tabindex="6"></div>
-    <div class="box label c1" id="G7R2C7">향년</div>
+    <div class="box label c1" id="G7R2C7" style="font-size:14px;">향년</div>
     <div class="box c1 g7-year" id="G7R2C8" contenteditable="true" tabindex="8"></div>
     <div class="box c1" id="G7R2C9" style="background:#FAC090;"></div>
     <div class="box c1 g7-year" id="G7R2C10" contenteditable="true" tabindex="10"></div>
@@ -1926,6 +1926,33 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       if (baseYear > 2025) baseYear = closestGapjaYear(2025);
       if (baseYear < -999) baseYear = closestGapjaYear(-999);
       buildYearList(list, baseYear);
+    }, { passive: false });
+
+    // 터치 스와이프 스크롤 — 위아래 드래그 시 목록 재생성
+    let touchStartY = 0;
+    let touchLastY  = 0;
+    let touchAccum  = 0;
+    const TOUCH_STEP_PX = 40;
+    list.addEventListener("touchstart", (e) => {
+      touchStartY = e.touches[0].clientY;
+      touchLastY  = touchStartY;
+      touchAccum  = 0;
+    }, { passive: true });
+    list.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const y    = e.touches[0].clientY;
+      const diff = touchLastY - y;
+      touchLastY = y;
+      touchAccum += diff;
+      const steps = Math.trunc(touchAccum / TOUCH_STEP_PX);
+      if (steps !== 0) {
+        touchAccum -= steps * TOUCH_STEP_PX;
+        const next = fromAstronomicalYear(toAstronomicalYear(baseYear) + steps * 60);
+        baseYear = closestGapjaYear(next);
+        if (baseYear > 2025) baseYear = closestGapjaYear(2025);
+        if (baseYear < -999) baseYear = closestGapjaYear(-999);
+        buildYearList(list, baseYear);
+      }
     }, { passive: false });
 
     // 외부 클릭/터치 시 닫기
