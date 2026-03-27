@@ -12,7 +12,7 @@
 </script>
 <!-- 
   제작자: Sukju Lee
-  제작일: 2026-03-26
+  제작일: 2026-03-27
   설명: 육십갑자 구조 - 중국/한국 왕조 연도 조회
   라이선스: 상업적, 개인적 용도로 자유롭게 사용 가능합니다. 단, 판매는 금지합니다.
 -->
@@ -1877,10 +1877,13 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       item.textContent = yr <= 0 ? Math.abs(yr) : yr;
       item.addEventListener("mouseenter", () => item.style.background = "rgba(255,255,255,0.2)");
       item.addEventListener("mouseleave", () => item.style.background = i === 0 ? "rgba(255,255,255,0.15)" : "transparent");
-      item.addEventListener("click", () => {
+      function selectYear(e) {
+        e.preventDefault();
         updateYearInput(yr);
         list.remove();
-      });
+      }
+      item.addEventListener("click", selectYear);
+      item.addEventListener("touchend", selectYear);
       list.appendChild(item);
     }
   }
@@ -1925,18 +1928,25 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       buildYearList(list, baseYear);
     }, { passive: false });
 
-    // 외부 클릭 시 닫기
+    // 외부 클릭/터치 시 닫기
     setTimeout(() => {
-      document.addEventListener("mousedown", function handler(ev) {
+      function handler(ev) {
         if (!list.contains(ev.target) && ev.target !== yearDropdown) {
           list.remove();
           document.removeEventListener("mousedown", handler);
+          document.removeEventListener("touchstart", handler);
         }
-      });
+      }
+      document.addEventListener("mousedown", handler);
+      document.addEventListener("touchstart", handler);
     }, 0);
   }
 
   yearDropdown.addEventListener("click", showYearDropdown);
+  yearDropdown.addEventListener("touchend", function(e) {
+    e.preventDefault();
+    showYearDropdown();
+  });
 
   function moveCycle(year, step) { let y = toAstronomicalYear(year) + step * 60; return fromAstronomicalYear(y); }
   function changeYear(step) { updateYearInput(moveCycle(internalYear, step)); }
