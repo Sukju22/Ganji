@@ -2329,20 +2329,23 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         list.style.top      = rect.bottom + "px";
         list.style.width    = "auto";
         list.style.minWidth = rect.width + "px";
-        list.style.right    = "";  /* right 항상 초기화 */
+        list.style.left     = "";
+        list.style.right    = "";
 
         if (dropdownId === "g2Dropdown1") {
-          // 중국 왕조: 버튼 왼쪽 기준
+          // 중국 왕조: 셀 왼쪽 기준 → 목록이 오른쪽으로 펼쳐짐
           list.style.left = rect.left + "px";
         } else {
-          // 한국 왕조: 버튼 오른쪽 끝 기준 → 목록 너비 측정 후 left 계산
-          list.style.left       = "0px";
+          // 한국 왕조: 셀 오른쪽 기준 → 목록이 왼쪽으로 펼쳐짐
+          // minWidth 적용 후 실제 너비 측정
+          list.style.position   = "fixed";
           list.style.visibility = "hidden";
           list.style.display    = "block";
-          const listW = list.offsetWidth;
+          list.style.left       = "-9999px"; // 화면 밖에서 측정
+          const listW = list.getBoundingClientRect().width;
           list.style.visibility = "";
           list.style.display    = "";
-          list.style.left = (rect.right - listW) + "px";
+          list.style.left       = (rect.right - listW) + "px";
         }
       }
     });
