@@ -866,8 +866,29 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
 input[type=number] { -moz-appearance:textfield; }
 
-
-
+/* =============================================
+   📱 휴대폰 전용 폰트 조정
+   480px 이하 화면에서만 적용
+   PC / 태블릿(481px 이상)은 전혀 영향 없음
+============================================= */
+@media screen and (max-width: 480px) {
+  :root {
+    --g1-font-size:           10px;   /* G1  11 → 10 */
+    --g2-font-size:           15px;   /* G2 선택표시  18 → 15 */
+    --g2-arrow-font-size:     24px;   /* G2 화살표    30 → 24 */
+    --g2-title-font-size:     12px;   /* G2 타이틀    14 → 12 */
+    --g2-option-font-size:    15px;   /* G2 목록항목  18 → 15 */
+    --g3-font-size:           12px;   /* G3           14 → 12 */
+    --g3-yearinput-font-size: 12px;   /* G3 연도입력  14 → 12 */
+    --g3-yearbtn-font-size:   13px;   /* G3 ◀▶버튼   16 → 13 */
+    --g4-font-size:           14px;   /* G4           17 → 14 */
+    --g5-font-size:           10px;   /* G5           12 → 10 */
+    --g6-font-size:           15px;   /* G6 한자/한글 18 → 15 */
+    --g7-font-size:           13px;   /* G7           16 → 13 */
+    --g7-label-font-size:      9px;   /* G7 레이블    11 →  9 */
+    --box-font-size:          13px;   /* 공통 box     16 → 13 */
+  }
+}
 
 </style>
 </head>
