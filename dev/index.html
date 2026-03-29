@@ -1772,7 +1772,10 @@ cells.forEach((cell, index) => {
     const hanjaRect = cell.querySelector(".hanjaBox").getBoundingClientRect();
     const korRect2  = cell.querySelector(".korBox").getBoundingClientRect();
     const isOnHanja = e.clientY >= hanjaRect.top && e.clientY < hanjaRect.bottom;
-    // topBox 클릭 시 한자 영역으로 처리 (isOnHanja = true 유지)
+    const isOnKor   = e.clientY >= korRect2.top  && e.clientY < korRect2.bottom;
+
+    // topBox 영역이면 툴팁 숨김
+    if (!isOnHanja && !isOnKor) { tooltip.style.display = "none"; return; }
 
     const copyText = getG6CopyText(hanjaText, korText, isOnHanja, e.ctrlKey, e.altKey);
     if (copyText === null) { tooltip.style.display = "none"; return; }
