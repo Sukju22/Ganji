@@ -2341,9 +2341,9 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
           list.style.left  = (rect.left + (zoomOn ? vvLeft : 0)) + "px";
           list.style.right = "";
         } else {
-          // 한국 왕조: 버튼 오른쪽 기준으로 목록 표시 (화면 우측 밖으로 나가지 않게)
+          // 한국 왕조: 버튼 오른쪽 끝 기준 (position:fixed의 right는 window.innerWidth 기준)
           list.style.left  = "";
-          list.style.right = (vvW - rect.right - (zoomOn ? vvLeft : 0)) + "px";
+          list.style.right = (window.innerWidth - rect.right) + "px";
         }
       }
     });
