@@ -1796,22 +1796,28 @@ cells.forEach((cell, index) => {
     const tipH = tooltip.offsetHeight;
     tooltip.style.visibility = "";
 
-    // 수직: 기준 영역 상단에 맞춤
-    let top = targetRect.top;
+    // pinch-to-zoom 보정: visualViewport가 있으면 offset 적용
+    const vvLeft   = window.visualViewport ? window.visualViewport.offsetLeft : 0;
+    const vvTop    = window.visualViewport ? window.visualViewport.offsetTop  : 0;
+    const vvWidth  = window.visualViewport ? window.visualViewport.width      : window.innerWidth;
+    const vvHeight = window.visualViewport ? window.visualViewport.height     : window.innerHeight;
 
-    // 수평: 왼쪽 절반이면 오른쪽, 오른쪽 절반이면 왼쪽
+    // 수직: 기준 영역 상단에 맞춤 (visualViewport 보정)
+    let top  = targetRect.top  + vvTop;
     let left;
+
+    // 수평: 왼쪽 절반이면 오른쪽, 오른쪽 절반이면 왼쪽 (visualViewport 보정)
     if (isLeftHalf) {
-      left = targetRect.right + 2;
+      left = targetRect.right + vvLeft + 2;
     } else {
-      left = targetRect.left - tipW - 2;
+      left = targetRect.left  + vvLeft - tipW - 2;
     }
 
-    // 화면 밖으로 나가는 경우 보정 (상대적으로 처리)
-    if (left < 0) left = targetRect.right + 2;
-    if (left + tipW > window.innerWidth) left = targetRect.left - tipW - 2;
-    if (top + tipH > window.innerHeight) top = window.innerHeight - tipH - 4;
-    if (top < 0) top = 0;
+    // 화면 밖으로 나가는 경우 보정 (visualViewport 기준)
+    if (left < vvLeft)                    left = targetRect.right + vvLeft + 2;
+    if (left + tipW > vvLeft + vvWidth)   left = targetRect.left  + vvLeft - tipW - 2;
+    if (top + tipH  > vvTop  + vvHeight)  top  = vvTop + vvHeight - tipH - 4;
+    if (top < vvTop)                      top  = vvTop;
 
     tooltip.style.left = left + "px";
     tooltip.style.top  = top  + "px";
