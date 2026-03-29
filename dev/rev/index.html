@@ -3545,6 +3545,25 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
     setTimeout(() => b.textContent = "복사", 1500);
   }
 
+  // 디버그 패널 위치/크기를 visualViewport 기준으로 갱신
+  function updateDbgPosition() {
+    const dbg = document.getElementById("_dbg");
+    if (!dbg) return;
+    const vv = window.visualViewport;
+    if (vv) {
+      dbg.style.left   = vv.offsetLeft + "px";
+      dbg.style.width  = vv.width + "px";
+      dbg.style.bottom = "0px";
+      // 작은 화면(폰/줌) 대응: 480px 이하면 폰트/패딩 축소
+      const small = vv.width <= 480;
+      dbg.style.fontSize  = small ? "9px"  : "11px";
+      dbg.style.padding   = small ? "3px 4px" : "4px 6px";
+    } else {
+      dbg.style.left  = "0px";
+      dbg.style.width = "100%";
+    }
+  }
+
   window.showDebug = function(msg) {
     const dbgEl = document.getElementById("_dbg");
     if (!window.g6DebugEnabled) {
@@ -3555,10 +3574,10 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
     if (!dbg) {
       dbg = document.createElement("div");
       dbg.id = "_dbg";
-      dbg.style.cssText = "position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#fff;font-size:11px;padding:4px 6px;z-index:99999;line-height:1.6;display:flex;align-items:center;gap:6px;flex-wrap:wrap;";
+      dbg.style.cssText = "position:fixed;bottom:0;left:0;width:100%;background:rgba(0,0,0,0.9);color:#fff;font-size:11px;padding:4px 6px;z-index:99999;line-height:1.6;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;box-sizing:border-box;overflow:hidden;";
       const txt = document.createElement("span");
       txt.id = "_dbg_txt";
-      txt.style.cssText = "flex:1;";
+      txt.style.cssText = "flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;";
       dbg.appendChild(txt);
       const b = document.createElement("button");
       b.textContent = "복사";
@@ -3578,6 +3597,7 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
     }
     dbg.style.display = "flex";
     document.getElementById("_dbg_txt").innerHTML = msg;
+    updateDbgPosition();
   };
 
   // 디버그 메시지 생성 함수 (폰트 + 화면 크기 통합)
@@ -3602,10 +3622,16 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
   // 초기 표시
   showDebug(buildDebugMsg());
 
-  // 화면 크기 변경 시 실시간 업데이트
-  window.addEventListener("resize", function() {
+  // 화면 크기 변경 시 실시간 업데이트 (visualViewport 줌/스크롤 포함)
+  function onViewportChange() {
     if (window.g6DebugEnabled) showDebug(buildDebugMsg());
-  });
+    else updateDbgPosition();
+  }
+  window.addEventListener("resize", onViewportChange);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onViewportChange);
+    window.visualViewport.addEventListener("scroll", onViewportChange);
+  }
 
   // 토글
   btn.addEventListener("click", function() {
