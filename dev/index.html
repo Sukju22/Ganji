@@ -1656,9 +1656,13 @@ cells.forEach((cell, index) => {
     const hanjaText = hanja.textContent.trim();
     const korText   = kor.textContent.trim();
     const hanjaRect = hanja.getBoundingClientRect();
-    const isOnHanja = event.clientY < hanjaRect.bottom;
+    const korRect   = kor.getBoundingClientRect();
+    const isOnHanja = event.clientY >= hanjaRect.top && event.clientY < hanjaRect.bottom;
+    const isOnKor   = event.clientY >= korRect.top   && event.clientY < korRect.bottom;
+    const isOnTop   = !isOnHanja && !isOnKor;
 
-    if (window.g6ClipEnabled) {
+    // topBox 클릭 시 → 클립보드 복사 없이 셀 선택만 진행
+    if (!isOnTop && window.g6ClipEnabled) {
       const copyText = getG6CopyText(hanjaText, korText, isOnHanja, event.ctrlKey, event.altKey);
       if (copyText !== null) {
         navigator.clipboard.writeText(copyText)
@@ -1766,7 +1770,9 @@ cells.forEach((cell, index) => {
     const hanjaText = cell.querySelector(".hanjaBox").textContent.trim();
     const korText   = cell.querySelector(".korBox").textContent.trim();
     const hanjaRect = cell.querySelector(".hanjaBox").getBoundingClientRect();
+    const korRect2  = cell.querySelector(".korBox").getBoundingClientRect();
     const isOnHanja = e.clientY >= hanjaRect.top && e.clientY < hanjaRect.bottom;
+    // topBox 클릭 시 한자 영역으로 처리 (isOnHanja = true 유지)
 
     const copyText = getG6CopyText(hanjaText, korText, isOnHanja, e.ctrlKey, e.altKey);
     if (copyText === null) { tooltip.style.display = "none"; return; }
@@ -1774,20 +1780,36 @@ cells.forEach((cell, index) => {
     const tipFs = (typeof tooltipSizeMap !== "undefined" && tooltipSizeMap[window.g6TooltipSize]) || 11;
     tooltip.innerHTML = `<span style="font-size:${tipFs}px;font-family:'D2Coding', monospace;color:#000;">${copyText}</span>`;
 
-    const cellRect = cell.getBoundingClientRect();
     const cellIndex = Array.from(cells).indexOf(cell);
     const isLeftHalf = (cellIndex % 10) < 5;
 
-    let left, top;
-    top = cellRect.top;
+    // 마우스가 한자/한글 영역 중 어디에 있는지에 따라 기준 rect 결정
+    const targetRect = isOnHanja ? hanjaRect : korRect2;
+
+    // 툴팁 너비 측정을 위해 일단 표시 (투명하게)
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "flex";
+    const tipW = tooltip.offsetWidth;
+    const tipH = tooltip.offsetHeight;
+    tooltip.style.visibility = "";
+
+    // 수직: 기준 영역 상단에 맞춤
+    let top = targetRect.top;
+
+    // 수평: 왼쪽 절반이면 오른쪽, 오른쪽 절반이면 왼쪽
+    let left;
     if (isLeftHalf) {
-      left = cellRect.right + 2;
+      left = targetRect.right + 2;
     } else {
-      left = cellRect.left - 2;
-      tooltip.style.display = "flex"; // 먼저 보이게 해서 width 계산
-      left = cellRect.left - tooltip.offsetWidth - 2;
+      left = targetRect.left - tipW - 2;
     }
-    if (top + 30 > window.innerHeight) top = window.innerHeight - 35;
+
+    // 화면 밖으로 나가는 경우 보정 (상대적으로 처리)
+    if (left < 0) left = targetRect.right + 2;
+    if (left + tipW > window.innerWidth) left = targetRect.left - tipW - 2;
+    if (top + tipH > window.innerHeight) top = window.innerHeight - tipH - 4;
+    if (top < 0) top = 0;
+
     tooltip.style.left = left + "px";
     tooltip.style.top  = top  + "px";
     tooltip.style.display = "flex";
