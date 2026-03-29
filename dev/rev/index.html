@@ -2324,26 +2324,25 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         document.body.appendChild(tmpEl);
         const varWidth = tmpEl.offsetWidth;
         document.body.removeChild(tmpEl);
-        // visualViewport 보정
-        const vv      = window.visualViewport;
-        const vvLeft  = vv ? vv.offsetLeft : 0;
-        const vvTop   = vv ? vv.offsetTop  : 0;
-        const vvW     = vv ? vv.width      : window.innerWidth;
-        const scale   = vv ? (vv.scale || 1) : 1;
-        const zoomOn  = scale > 1.01;
-
-        list.style.top      = (rect.bottom + (zoomOn ? vvTop  : 0)) + "px";
+        // getBoundingClientRect()는 줌 상태에서도 position:fixed와 동일한 좌표계
+        // → offset 보정 없이 rect 값 그대로 사용
+        list.style.top      = rect.bottom + "px";
         list.style.width    = "auto";
         list.style.minWidth = rect.width + "px";
+        list.style.right    = "";  /* right 항상 초기화 */
 
         if (dropdownId === "g2Dropdown1") {
-          // 중국 왕조: 버튼 왼쪽 기준으로 목록 표시
-          list.style.left  = (rect.left + (zoomOn ? vvLeft : 0)) + "px";
-          list.style.right = "";
+          // 중국 왕조: 버튼 왼쪽 기준
+          list.style.left = rect.left + "px";
         } else {
-          // 한국 왕조: 버튼 오른쪽 끝 기준 (position:fixed의 right는 window.innerWidth 기준)
-          list.style.left  = "";
-          list.style.right = (window.innerWidth - rect.right) + "px";
+          // 한국 왕조: 버튼 오른쪽 끝 기준 → 목록 너비 측정 후 left 계산
+          list.style.left       = "0px";
+          list.style.visibility = "hidden";
+          list.style.display    = "block";
+          const listW = list.offsetWidth;
+          list.style.visibility = "";
+          list.style.display    = "";
+          list.style.left = (rect.right - listW) + "px";
         }
       }
     });
