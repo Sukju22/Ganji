@@ -374,7 +374,8 @@ body {
 }
 .g2-dropdown .g2-list {
   display: none;
-  position: fixed;
+  position: absolute;
+  top: 100%;          /* 버튼 바로 아래 */
   background: var(--color-bg-page);
   border: 1px solid var(--color-border-light);
   box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
@@ -384,6 +385,16 @@ body {
   min-width: 200px;
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: var(--g2-scrollbar-thumb) var(--g2-scrollbar-track); /* Firefox */
+}
+/* 중국 왕조: 왼쪽 기준으로 오른쪽 펼침 */
+#g2Dropdown1 .g2-list {
+  left: 0;
+  right: auto;
+}
+/* 한국 왕조: 오른쪽 기준으로 왼쪽 펼침 */
+#g2Dropdown2 .g2-list {
+  left: auto;
+  right: 0;
 }
 /* Chrome/Edge/Safari */
 .g2-dropdown .g2-list::-webkit-scrollbar {
@@ -2316,33 +2327,6 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       document.querySelectorAll(".g2-dropdown.open").forEach(d => d.classList.remove("open"));
       if (!isOpen) {
         dropdown.classList.add("open");
-        const rect = selected.getBoundingClientRect();
-        const varName = dropdownId === "g2Dropdown1" ? "--g2-list1-width" : "--g2-list2-width";
-        // calc() 값을 정확히 읽기 위해 임시 엘리먼트로 계산
-        const tmpEl = document.createElement("div");
-        tmpEl.style.cssText = `position:absolute;visibility:hidden;width:var(${varName});`;
-        document.body.appendChild(tmpEl);
-        const varWidth = tmpEl.offsetWidth;
-        document.body.removeChild(tmpEl);
-        list.style.top      = rect.bottom + "px";
-        list.style.width    = "auto";
-        list.style.minWidth = rect.width + "px";
-        list.style.left     = "";
-        list.style.right    = "";
-
-        if (dropdownId === "g2Dropdown1") {
-          // 중국 왕조: 셀 왼쪽 기준 → 오른쪽으로 펼쳐짐
-          list.style.left = rect.left + "px";
-        } else {
-          // 한국 왕조: 셀 오른쪽 기준 → 왼쪽으로 펼쳐짐
-          list.style.visibility = "hidden";
-          list.style.display    = "block";
-          list.style.left       = "-9999px";
-          const listW = list.getBoundingClientRect().width;
-          list.style.visibility = "";
-          list.style.display    = "";
-          list.style.left       = (rect.right - listW) + "px";
-        }
       }
     });
 
