@@ -2324,12 +2324,27 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         document.body.appendChild(tmpEl);
         const varWidth = tmpEl.offsetWidth;
         document.body.removeChild(tmpEl);
-        list.style.top   = rect.bottom + "px";
-        list.style.width = "auto"; /* 내용에 맞게 자동 조정 */
-        list.style.minWidth = rect.width + "px"; /* 최소 버튼 폭 */
-        // 목록을 버튼 오른쪽 끝에 맞춤 (right 기준)
-        list.style.left  = "";
-        list.style.right = (window.innerWidth - rect.right) + "px";
+        // visualViewport 보정
+        const vv      = window.visualViewport;
+        const vvLeft  = vv ? vv.offsetLeft : 0;
+        const vvTop   = vv ? vv.offsetTop  : 0;
+        const vvW     = vv ? vv.width      : window.innerWidth;
+        const scale   = vv ? (vv.scale || 1) : 1;
+        const zoomOn  = scale > 1.01;
+
+        list.style.top      = (rect.bottom + (zoomOn ? vvTop  : 0)) + "px";
+        list.style.width    = "auto";
+        list.style.minWidth = rect.width + "px";
+
+        if (dropdownId === "g2Dropdown1") {
+          // 중국 왕조: 버튼 왼쪽 기준으로 목록 표시
+          list.style.left  = (rect.left + (zoomOn ? vvLeft : 0)) + "px";
+          list.style.right = "";
+        } else {
+          // 한국 왕조: 버튼 오른쪽 기준으로 목록 표시 (화면 우측 밖으로 나가지 않게)
+          list.style.left  = "";
+          list.style.right = (vvW - rect.right - (zoomOn ? vvLeft : 0)) + "px";
+        }
       }
     });
 
