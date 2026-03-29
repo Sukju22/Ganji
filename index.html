@@ -12,7 +12,7 @@
 </script>
 <!-- 
   제작자: Sukju Lee
-  제작일: 2026-03-27
+  제작일: 2026-03-29
   설명: 육십갑자 구조 - 중국/한국 왕조 연도 조회
   라이선스: 상업적, 개인적 용도로 자유롭게 사용 가능합니다. 단, 판매는 금지합니다.
 -->
@@ -49,7 +49,7 @@
   /* ----------------------------------------
      버전
   ---------------------------------------- */
-  --version:              "v1.0.0"; /* 버전 넘버 */
+  --version:              "v1.0.1"; /* 버전 넘버 */
   --version-opacity:      0.3;      /* G3C3 버전 텍스트 투명도 (30%) */
   --g3c1-opacity:         0.3;      /* G3C1 인덱스 숫자 투명도 (30%) */
 
@@ -374,7 +374,8 @@ body {
 }
 .g2-dropdown .g2-list {
   display: none;
-  position: fixed;
+  position: absolute;
+  top: 100%;          /* 버튼 바로 아래 */
   background: var(--color-bg-page);
   border: 1px solid var(--color-border-light);
   box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
@@ -384,6 +385,16 @@ body {
   min-width: 200px;
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: var(--g2-scrollbar-thumb) var(--g2-scrollbar-track); /* Firefox */
+}
+/* 중국 왕조: 왼쪽 기준으로 오른쪽 펼침 */
+#g2Dropdown1 .g2-list {
+  left: 0;
+  right: auto;
+}
+/* 한국 왕조: 오른쪽 기준으로 왼쪽 펼침 */
+#g2Dropdown2 .g2-list {
+  left: auto;
+  right: 0;
 }
 /* Chrome/Edge/Safari */
 .g2-dropdown .g2-list::-webkit-scrollbar {
@@ -866,8 +877,29 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin:0; }
 input[type=number] { -moz-appearance:textfield; }
 
-
-
+/* =============================================
+   📱 휴대폰 전용 폰트 조정
+   480px 이하 화면에서만 적용
+   PC / 태블릿(481px 이상)은 전혀 영향 없음
+============================================= */
+@media screen and (max-width: 480px) {
+  :root {
+    --g1-font-size:           10px;   /* G1  11 → 10 */
+    --g2-font-size:           15px;   /* G2 선택표시  18 → 15 */
+    --g2-arrow-font-size:     24px;   /* G2 화살표    30 → 24 */
+    --g2-title-font-size:     12px;   /* G2 타이틀    14 → 12 */
+    --g2-option-font-size:    15px;   /* G2 목록항목  18 → 15 */
+    --g3-font-size:           12px;   /* G3           14 → 12 */
+    --g3-yearinput-font-size: 12px;   /* G3 연도입력  14 → 12 */
+    --g3-yearbtn-font-size:   13px;   /* G3 ◀▶버튼   16 → 13 */
+    --g4-font-size:           13px;   /* G4           17 → 13 */
+    --g5-font-size:           10px;   /* G5           12 → 10 */
+    --g6-font-size:           15px;   /* G6 한자/한글 18 → 15 */
+    --g7-font-size:           13px;   /* G7           16 → 13 */
+    --g7-label-font-size:      9px;   /* G7 레이블    11 →  9 */
+    --box-font-size:          13px;   /* 공통 box     16 → 13 */
+  }
+}
 
 </style>
 </head>
@@ -1656,9 +1688,13 @@ cells.forEach((cell, index) => {
     const hanjaText = hanja.textContent.trim();
     const korText   = kor.textContent.trim();
     const hanjaRect = hanja.getBoundingClientRect();
-    const isOnHanja = event.clientY < hanjaRect.bottom;
+    const korRect   = kor.getBoundingClientRect();
+    const isOnHanja = event.clientY >= hanjaRect.top && event.clientY < hanjaRect.bottom;
+    const isOnKor   = event.clientY >= korRect.top   && event.clientY < korRect.bottom;
+    const isOnTop   = !isOnHanja && !isOnKor;
 
-    if (window.g6ClipEnabled) {
+    // topBox 클릭 시 → 클립보드 복사 없이 셀 선택만 진행
+    if (!isOnTop && window.g6ClipEnabled) {
       const copyText = getG6CopyText(hanjaText, korText, isOnHanja, event.ctrlKey, event.altKey);
       if (copyText !== null) {
         navigator.clipboard.writeText(copyText)
@@ -1766,7 +1802,12 @@ cells.forEach((cell, index) => {
     const hanjaText = cell.querySelector(".hanjaBox").textContent.trim();
     const korText   = cell.querySelector(".korBox").textContent.trim();
     const hanjaRect = cell.querySelector(".hanjaBox").getBoundingClientRect();
+    const korRect2  = cell.querySelector(".korBox").getBoundingClientRect();
     const isOnHanja = e.clientY >= hanjaRect.top && e.clientY < hanjaRect.bottom;
+    const isOnKor   = e.clientY >= korRect2.top  && e.clientY < korRect2.bottom;
+
+    // topBox 영역이면 툴팁 숨김
+    if (!isOnHanja && !isOnKor) { tooltip.style.display = "none"; return; }
 
     const copyText = getG6CopyText(hanjaText, korText, isOnHanja, e.ctrlKey, e.altKey);
     if (copyText === null) { tooltip.style.display = "none"; return; }
@@ -1774,20 +1815,42 @@ cells.forEach((cell, index) => {
     const tipFs = (typeof tooltipSizeMap !== "undefined" && tooltipSizeMap[window.g6TooltipSize]) || 11;
     tooltip.innerHTML = `<span style="font-size:${tipFs}px;font-family:'D2Coding', monospace;color:#000;">${copyText}</span>`;
 
-    const cellRect = cell.getBoundingClientRect();
     const cellIndex = Array.from(cells).indexOf(cell);
     const isLeftHalf = (cellIndex % 10) < 5;
 
-    let left, top;
-    top = cellRect.top;
+    // 마우스가 한자/한글 영역 중 어디에 있는지에 따라 기준 rect 결정
+    const targetRect = isOnHanja ? hanjaRect : korRect2;
+
+    // 툴팁 너비 측정을 위해 일단 표시 (투명하게)
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "flex";
+    const tipW = tooltip.offsetWidth;
+    const tipH = tooltip.offsetHeight;
+    tooltip.style.visibility = "";
+
+    // pinch-to-zoom 보정: visualViewport가 있으면 offset 적용
+    const vvLeft   = window.visualViewport ? window.visualViewport.offsetLeft : 0;
+    const vvTop    = window.visualViewport ? window.visualViewport.offsetTop  : 0;
+    const vvWidth  = window.visualViewport ? window.visualViewport.width      : window.innerWidth;
+    const vvHeight = window.visualViewport ? window.visualViewport.height     : window.innerHeight;
+
+    // 수직: 기준 영역 상단에 맞춤 (visualViewport 보정)
+    let top  = targetRect.top  + vvTop;
+    let left;
+
+    // 수평: 왼쪽 절반이면 오른쪽, 오른쪽 절반이면 왼쪽 (visualViewport 보정)
     if (isLeftHalf) {
-      left = cellRect.right + 2;
+      left = targetRect.right + vvLeft + 2;
     } else {
-      left = cellRect.left - 2;
-      tooltip.style.display = "flex"; // 먼저 보이게 해서 width 계산
-      left = cellRect.left - tooltip.offsetWidth - 2;
+      left = targetRect.left  + vvLeft - tipW - 2;
     }
-    if (top + 30 > window.innerHeight) top = window.innerHeight - 35;
+
+    // 화면 밖으로 나가는 경우 보정 (visualViewport 기준)
+    if (left < vvLeft)                    left = targetRect.right + vvLeft + 2;
+    if (left + tipW > vvLeft + vvWidth)   left = targetRect.left  + vvLeft - tipW - 2;
+    if (top + tipH  > vvTop  + vvHeight)  top  = vvTop + vvHeight - tipH - 4;
+    if (top < vvTop)                      top  = vvTop;
+
     tooltip.style.left = left + "px";
     tooltip.style.top  = top  + "px";
     tooltip.style.display = "flex";
@@ -1926,12 +1989,34 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
     const list = document.createElement("div");
     list.id = "yearDropList";
     const rect = yearDropdown.getBoundingClientRect();
+
+    // pinch-to-zoom 보정: visualViewport offset 적용
+    const vv       = window.visualViewport;
+    const vvLeft   = vv ? vv.offsetLeft  : 0;
+    const vvTop    = vv ? vv.offsetTop   : 0;
+    const vvWidth  = vv ? vv.width       : window.innerWidth;
+    const vvHeight = vv ? vv.height      : window.innerHeight;
+
+    const listW  = Math.max(rect.width, 80);
+    const listH  = ITEM_H * VISIBLE;
+
+    // 기본 위치: 드롭다운 바로 아래 (getBoundingClientRect는 이미 viewport 기준이므로 zoom시에만 offset 가산)
+    const scale  = vv ? (vv.scale || 1) : 1;
+    let listLeft = rect.left + (scale > 1.01 ? vvLeft : 0);
+    let listTop  = rect.bottom + (scale > 1.01 ? vvTop : 0);
+
+    // 화면 밖으로 나가는 경우 보정
+    if (listLeft + listW > vvWidth)   listLeft = vvWidth - listW - 4;
+    if (listLeft < 0)                 listLeft = 0;
+    if (listTop  + listH > vvHeight)  listTop  = rect.top + (scale > 1.01 ? vvTop : 0) - listH; // 위로 펼치기
+    if (listTop  < 0)                 listTop  = 0;
+
     list.style.cssText = [
       "position:fixed",
-      `left:${rect.left}px`,
-      `top:${rect.bottom}px`,
-      `width:${Math.max(rect.width, 80)}px`,
-      `height:${ITEM_H * VISIBLE}px`,
+      `left:${listLeft}px`,
+      `top:${listTop}px`,
+      `width:${listW}px`,
+      `height:${listH}px`,
       "overflow-y:auto",
       "-webkit-overflow-scrolling:touch",
       "overscroll-behavior:contain",
@@ -2242,20 +2327,6 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       document.querySelectorAll(".g2-dropdown.open").forEach(d => d.classList.remove("open"));
       if (!isOpen) {
         dropdown.classList.add("open");
-        const rect = selected.getBoundingClientRect();
-        const varName = dropdownId === "g2Dropdown1" ? "--g2-list1-width" : "--g2-list2-width";
-        // calc() 값을 정확히 읽기 위해 임시 엘리먼트로 계산
-        const tmpEl = document.createElement("div");
-        tmpEl.style.cssText = `position:absolute;visibility:hidden;width:var(${varName});`;
-        document.body.appendChild(tmpEl);
-        const varWidth = tmpEl.offsetWidth;
-        document.body.removeChild(tmpEl);
-        list.style.top   = rect.bottom + "px";
-        list.style.width = "auto"; /* 내용에 맞게 자동 조정 */
-        list.style.minWidth = rect.width + "px"; /* 최소 버튼 폭 */
-        // 목록을 버튼 오른쪽 끝에 맞춤 (right 기준)
-        list.style.left  = "";
-        list.style.right = (window.innerWidth - rect.right) + "px";
       }
     });
 
@@ -3471,6 +3542,25 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
     setTimeout(() => b.textContent = "복사", 1500);
   }
 
+  // 디버그 패널 위치/크기를 visualViewport 기준으로 갱신
+  function updateDbgPosition() {
+    const dbg = document.getElementById("_dbg");
+    if (!dbg) return;
+    const vv = window.visualViewport;
+    if (vv) {
+      dbg.style.left   = vv.offsetLeft + "px";
+      dbg.style.width  = vv.width + "px";
+      dbg.style.bottom = "0px";
+      // 작은 화면(폰/줌) 대응: 480px 이하면 폰트/패딩 축소
+      const small = vv.width <= 480;
+      dbg.style.fontSize  = small ? "9px"  : "11px";
+      dbg.style.padding   = small ? "3px 4px" : "4px 6px";
+    } else {
+      dbg.style.left  = "0px";
+      dbg.style.width = "100%";
+    }
+  }
+
   window.showDebug = function(msg) {
     const dbgEl = document.getElementById("_dbg");
     if (!window.g6DebugEnabled) {
@@ -3481,10 +3571,10 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
     if (!dbg) {
       dbg = document.createElement("div");
       dbg.id = "_dbg";
-      dbg.style.cssText = "position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#fff;font-size:11px;padding:4px 6px;z-index:99999;line-height:1.6;display:flex;align-items:center;gap:6px;flex-wrap:wrap;";
+      dbg.style.cssText = "position:fixed;bottom:0;left:0;width:100%;background:rgba(0,0,0,0.9);color:#fff;font-size:11px;padding:4px 6px;z-index:99999;line-height:1.6;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;box-sizing:border-box;overflow:hidden;";
       const txt = document.createElement("span");
       txt.id = "_dbg_txt";
-      txt.style.cssText = "flex:1;";
+      txt.style.cssText = "flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;";
       dbg.appendChild(txt);
       const b = document.createElement("button");
       b.textContent = "복사";
@@ -3504,6 +3594,7 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
     }
     dbg.style.display = "flex";
     document.getElementById("_dbg_txt").innerHTML = msg;
+    updateDbgPosition();
   };
 
   // 디버그 메시지 생성 함수 (폰트 + 화면 크기 통합)
@@ -3528,10 +3619,16 @@ updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
   // 초기 표시
   showDebug(buildDebugMsg());
 
-  // 화면 크기 변경 시 실시간 업데이트
-  window.addEventListener("resize", function() {
+  // 화면 크기 변경 시 실시간 업데이트 (visualViewport 줌/스크롤 포함)
+  function onViewportChange() {
     if (window.g6DebugEnabled) showDebug(buildDebugMsg());
-  });
+    else updateDbgPosition();
+  }
+  window.addEventListener("resize", onViewportChange);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onViewportChange);
+    window.visualViewport.addEventListener("scroll", onViewportChange);
+  }
 
   // 토글
   btn.addEventListener("click", function() {
