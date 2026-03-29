@@ -2324,8 +2324,6 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         document.body.appendChild(tmpEl);
         const varWidth = tmpEl.offsetWidth;
         document.body.removeChild(tmpEl);
-        // getBoundingClientRect()는 줌 상태에서도 position:fixed와 동일한 좌표계
-        // → offset 보정 없이 rect 값 그대로 사용
         list.style.top      = rect.bottom + "px";
         list.style.width    = "auto";
         list.style.minWidth = rect.width + "px";
@@ -2333,15 +2331,13 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         list.style.right    = "";
 
         if (dropdownId === "g2Dropdown1") {
-          // 중국 왕조: 셀 왼쪽 기준 → 목록이 오른쪽으로 펼쳐짐
+          // 중국 왕조: 셀 왼쪽 기준 → 오른쪽으로 펼쳐짐
           list.style.left = rect.left + "px";
         } else {
-          // 한국 왕조: 셀 오른쪽 기준 → 목록이 왼쪽으로 펼쳐짐
-          // minWidth 적용 후 실제 너비 측정
-          list.style.position   = "fixed";
+          // 한국 왕조: 셀 오른쪽 기준 → 왼쪽으로 펼쳐짐
           list.style.visibility = "hidden";
           list.style.display    = "block";
-          list.style.left       = "-9999px"; // 화면 밖에서 측정
+          list.style.left       = "-9999px";
           const listW = list.getBoundingClientRect().width;
           list.style.visibility = "";
           list.style.display    = "";
