@@ -21,7 +21,15 @@
 - 웹페이지 주소: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)  
 - 항상 최신 버전이 `index.html`로 열림
 
+---
+## Fonts
 
+This project uses the following fonts:
+
+- D2Coding — licensed under the SIL Open Font License 1.1
+- Malgun Gothic — system font provided by Microsoft Windows
+
+Font files for Malgun Gothic are not distributed with this project.
 ---
 
 ## License
