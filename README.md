@@ -32,6 +32,7 @@ This project uses the following fonts:
 Font files for Malgun Gothic are not distributed with this project.
 ---
 
+---
 ## License
 
 `index.html` is a free HTML tool.
