@@ -27,6 +27,8 @@
 This project uses the following fonts:
 
 - D2Coding — licensed under the SIL Open Font License 1.1
+  - https://github.com/naver/d2codingfont/releases
+  - [https://d2.naver.com/news/6492529](https://github.com/naver/d2codingfont)
 - Malgun Gothic — system font provided by Microsoft Windows
 
 Font files for Malgun Gothic are not distributed with this project.
