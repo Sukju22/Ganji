@@ -1,4 +1,4 @@
-# Ganji HTML Project
+# Ganji HTML Project v1.0.2
 
 ## 프로젝트 소개
 간지를 왕의 치세년도에 따른 년도로 쉽게 찾을 수 있도록 하기 위해 만들었습니다.
