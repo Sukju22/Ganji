@@ -24,26 +24,20 @@
 
 ---
 
-## 라이선스
-# index.html
-
-index.html is a free HTML tool.
-
-Anyone can use, modify, and distribute this file.
-
 ## License
 
-This project is licensed under  
-Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+`index.html` is a free HTML tool.
 
-You may:
-- Use the file
-- Modify it
-- Share it
+You are free to:
+- Use
+- Modify
+- Distribute
 
 You may NOT:
 - Sell this file
 - Sell modified versions of this file
+
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
 
 License details:
 https://creativecommons.org/licenses/by-nc/4.0/
