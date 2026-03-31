@@ -12,7 +12,7 @@
 </script>
 <!-- 
   제작자: Sukju Lee
-  제작일: 2026-03-29
+  제작일: 2026-03-30
   설명: 육십갑자 구조 - 중국/한국 왕조 연도 조회
   라이선스: 상업적, 개인적 용도로 자유롭게 사용 가능합니다. 단, 판매는 금지합니다.
 -->
@@ -49,7 +49,7 @@
   /* ----------------------------------------
      버전
   ---------------------------------------- */
-  --version:              "v1.0.1"; /* 버전 넘버 */
+  --version:              "v1.0.2"; /* 버전 넘버 */
   --version-opacity:      0.3;      /* G3C3 버전 텍스트 투명도 (30%) */
   --g3c1-opacity:         0.3;      /* G3C1 인덱스 숫자 투명도 (30%) */
 
@@ -167,7 +167,7 @@
      G7 : 연도 계산 행
   ---------------------------------------- */
   --g7-bg:                #ffffff;  /* G7 셀 기본 배경색 */
-  --g7-box-color:         var(--g7-color-readonly); /* G7 box 기본 텍스트색 */
+  --g7-box-color:         var(--g7-color-readonly); /* G7 box 기본 텍스트색 → 읽기전용 회색 */
   --g7-font-size:         16px;     /* G7 box 폰트 크기 */
   --g7-font-family:       'D2Coding', monospace; /* G7 폰트 */
   --g7-font-weight:       bold;     /* G7 box 폰트 굵기 */
@@ -600,7 +600,7 @@ body {
   justify-content: center;
 }
 .G7 .g7-year {
-  color: var(--g7-color-input);
+  color: var(--g7-color-input) !important;
   cursor: text;
   outline: none;
   width: 100%;
@@ -618,12 +618,12 @@ body {
 #G7R1C9, #G7R2C9 {
   color: var(--g7-color-clip);
 }
-/* 클립 복사 셀 — G7R3C8 */
+/* 입력 가능 셀 — G7R3C8 (졸년) */
 #G7R3C8 {
-  color: var(--g7-color-clip);
+  color: var(--g7-color-input);
 }
 /* G7 클립보드 복사 셀 호버 — 폰트 빨강 */
-#G7R1C9:hover, #G7R2C9:hover, #G7R3C8:hover,
+#G7R1C9:hover, #G7R2C9:hover,
 #G7R1C1:hover, #G7R1C3:hover, #G7R1C5:hover, #G7R1C7:hover,
 #G7R2C1:hover, #G7R2C3:hover, #G7R2C5:hover,
 #G7R3C7:hover {
@@ -1029,7 +1029,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box c1 g7-year" id="G7R2C4" contenteditable="true" tabindex="4"></div>
     <div class="box label c1" id="G7R2C5"></div>
     <div class="box c1 g7-year" id="G7R2C6" contenteditable="true" tabindex="6"></div>
-    <div class="box label c1" id="G7R2C7" style="font-size:14px;">향년</div>
+    <div class="box label c1" id="G7R2C7" style="font-size:14px; cursor:pointer; user-select:none;">향년<sup id="G7R2C7sup" style="font-size:8px; color:#FF0000; font-weight:bold;">-1</sup></div>
     <div class="box c1 g7-year" id="G7R2C8" contenteditable="true" tabindex="8"></div>
     <div class="box c1" id="G7R2C9" style="background:#FAC090;"></div>
     <div class="box c1 g7-year" id="G7R2C10" contenteditable="true" tabindex="10"></div>
@@ -1043,7 +1043,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box label c1" id="G7R3C5"></div>
     <div class="box c1" id="G7R3C6"></div>
     <div class="box label c1" id="G7R3C7"></div>
-    <div class="box c1" id="G7R3C8"></div>
+    <div class="box c1 g7-year" id="G7R3C8" contenteditable="true" tabindex="11"></div>
     <div class="box label c1" id="G7R3C9"></div>
     <div class="box c1" id="G7R3C10"></div>
   </div>
@@ -3282,7 +3282,10 @@ function updateG7Row(pairs, years) {
       const full  = getG7GanjiText ? getG7GanjiText(year) : yearToGanji(year);
       const short = yearToGanjiShort(year);
       if (ganjiEl) ganjiEl.innerHTML = `<span class="full">${full}</span><span class="short">${short}</span>`;
-      if (yearEl)  yearEl.textContent = year <= 0 ? "BC" + Math.abs(year) : year;
+      if (yearEl) {
+        yearEl.textContent = year <= 0 ? "BC" + Math.abs(year) : year;
+        yearEl.style.color = "var(--g7-color-input)"; // 파랑 유지
+      }
     } else {
       if (ganjiEl) ganjiEl.innerHTML = "";
       if (yearEl)  yearEl.textContent = "";
@@ -3315,9 +3318,10 @@ function updateG7R3(r1Id, r2Id, r3Id) {
   }
 }
 
-// G7 입력 셀 빈칸 클릭 시 커서 중앙 처리
+// G7 입력 셀 빈칸 클릭 시 커서 중앙 처리 + 파랑색 인라인 적용
 document.querySelectorAll(".G7 .g7-year").forEach(el => {
   if (el.textContent.trim() === "") el.innerHTML = "<br>";
+  el.style.color = "var(--g7-color-input)"; // 파랑 인라인 명시
 
   el.addEventListener("focus", function() {
     if (this.innerHTML === "<br>" || this.textContent.trim() === "") {
@@ -3344,62 +3348,144 @@ G7R3CalcPairs.forEach(({ r1Id, r2Id, r3Id }) => {
 // 초기 계산
 updateAllG7R3();
 
-// ===== G7R3C8 자동계산: R1C8 + R2C8 - 1 = 사망년도 =====
-function updateG7R3C8() {
-  const r1C8 = document.getElementById("G7R1C8");
-  const r2C8 = document.getElementById("G7R2C8");
-  const v1 = parseInt(r1C8 ? r1C8.textContent.trim() : "");
-  const v2 = parseInt(r2C8 ? r2C8.textContent.trim() : "");
-  const r3C8El = document.getElementById("G7R3C8");
-  const r3C7El = document.getElementById("G7R3C7");
-  if (!r3C8El || !r3C7El) return;
+// ===== G7R2C7 향년/령 토글 =====
+// true = 향년 (-1 적용), false = 령 (0, -1 없음)
+let g7C8HyanMode = true; // 기본: 향년
 
-  if (!isNaN(v1) && !isNaN(v2)) {
-    const result = v1 + v2 + 1;
-    r3C8El.textContent = result;
-    const text  = getG7GanjiText(result);
-    const short = yearToGanjiShort(result);
-    r3C7El.innerHTML = `<span class="full">${text}</span><span class="short">${short}</span>`;
+function updateG7R2C7Label() {
+  const labelEl = document.getElementById("G7R2C7");
+  const supEl   = document.getElementById("G7R2C7sup");
+  if (!labelEl || !supEl) return;
+  if (g7C8HyanMode) {
+    labelEl.childNodes[0].textContent = "향년";
+    supEl.textContent = "-1";
+    supEl.style.display = "inline";
   } else {
-    r3C8El.textContent = "";
-    r3C7El.innerHTML = "";
+    labelEl.childNodes[0].textContent = "령";
+    supEl.style.display = "none";
+  }
+  // 값이 있으면 재계산
+  recalcC8(lastEditedC8[0] || "R2");
+}
+
+// G7R2C7 클릭 → 향년 ↔ 령 토글
+(function() {
+  const labelEl = document.getElementById("G7R2C7");
+  if (!labelEl) return;
+  labelEl.addEventListener("click", function() {
+    g7C8HyanMode = !g7C8HyanMode;
+    updateG7R2C7Label();
+  });
+  // 호버 효과
+  labelEl.addEventListener("mouseenter", function() {
+    this.style.color = "var(--color-text-red)";
+    this.style.fontWeight = "bold";
+  });
+  labelEl.addEventListener("mouseleave", function() {
+    this.style.color = "";
+    this.style.fontWeight = "";
+  });
+})();
+// 수식: 생년 + 향년 - 1 = 졸년
+// 마지막으로 수정된 두 셀을 기준으로 나머지 하나를 자동계산
+// lastEditedC8: 최근 수정 순서 추적 (최대 2개)
+let lastEditedC8 = []; // e.g. ["R1","R2"] → R3 자동계산
+
+function setC8GanjiCell(yearValue, ganjiElId) {
+  const ganjiEl = document.getElementById(ganjiElId);
+  if (!ganjiEl) return;
+  if (!isNaN(yearValue)) {
+    const text  = getG7GanjiText(yearValue);
+    const short = yearToGanjiShort(yearValue);
+    ganjiEl.innerHTML = `<span class="full">${text}</span><span class="short">${short}</span>`;
+  } else {
+    ganjiEl.innerHTML = "";
   }
 }
 
-// G7R2C8 입력 이벤트 (150 이하 제한)
-const G7R2C8El = document.getElementById("G7R2C8");
-if (G7R2C8El) {
-  G7R2C8El.addEventListener("focus", function() {
+function setC8Value(rowKey, value) {
+  const idMap = { R1: "G7R1C8", R2: "G7R2C8", R3: "G7R3C8" };
+  const ganjiMap = { R1: "G7R1C7", R2: null, R3: "G7R3C7" };
+  const el = document.getElementById(idMap[rowKey]);
+  if (!el) return;
+  el.textContent = isNaN(value) ? "" : value;
+  el.style.color = "var(--g7-color-input)"; // 자동계산 후에도 파랑 유지
+  if (ganjiMap[rowKey]) setC8GanjiCell(value, ganjiMap[rowKey]);
+}
+
+function getC8Value(rowKey) {
+  const idMap = { R1: "G7R1C8", R2: "G7R2C8", R3: "G7R3C8" };
+  return parseInt(document.getElementById(idMap[rowKey])?.textContent.trim() || "");
+}
+
+function recalcC8(editedRow) {
+  // 최근 수정 목록 갱신 (중복 제거 후 앞에 추가, 최대 2개 유지)
+  lastEditedC8 = [editedRow, ...lastEditedC8.filter(r => r !== editedRow)].slice(0, 2);
+
+  if (lastEditedC8.length < 2) return; // 2개 이상 입력돼야 계산
+
+  const [a, b] = lastEditedC8;
+  const remaining = ["R1","R2","R3"].find(r => r !== a && r !== b);
+  const va = getC8Value(a);
+  const vb = getC8Value(b);
+
+  if (isNaN(va) || isNaN(vb)) return; // 두 값 중 하나라도 없으면 계산 안 함
+
+  // 수식: 생년(R1) + 향년(R2) - offset = 졸년(R3)
+  // offset: 향년모드=1, 령모드=0
+  const offset = g7C8HyanMode ? 1 : 0;
+  const r1 = a === "R1" ? va : b === "R1" ? vb : NaN;
+  const r2 = a === "R2" ? va : b === "R2" ? vb : NaN;
+  const r3 = a === "R3" ? va : b === "R3" ? vb : NaN;
+
+  let result;
+  if (remaining === "R3") result = r1 + r2 - offset;  // 졸년 = 생년 + 향년 - offset
+  if (remaining === "R2") result = r3 - r1 + offset;  // 향년 = 졸년 - 생년 + offset
+  if (remaining === "R1") result = r3 - r2 + offset;  // 생년 = 졸년 - 향년 + offset
+
+  setC8Value(remaining, result);
+}
+
+function updateG7R3C8() { recalcC8("R1"); } // 하위 호환용 (refreshG7GanjiCells 에서 호출)
+
+// 공통 이벤트 등록 함수
+function attachC8Events(rowKey, maxVal) {
+  const idMap = { R1: "G7R1C8", R2: "G7R2C8", R3: "G7R3C8" };
+  const el = document.getElementById(idMap[rowKey]);
+  if (!el) return;
+
+  el.addEventListener("focus", function() {
     const range = document.createRange();
     range.selectNodeContents(this);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
   });
 
-  G7R2C8El.addEventListener("input", function() {
+  el.addEventListener("input", function() {
     let val = parseInt(this.textContent.trim());
-    if (!isNaN(val) && val > 150) {
-      this.textContent = "150";
-      // 커서를 끝으로 이동
+    if (maxVal && !isNaN(val) && val > maxVal) {
+      this.textContent = String(maxVal);
       const range = document.createRange();
       range.selectNodeContents(this);
       range.collapse(false);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(range);
+      val = maxVal;
     }
-    updateG7R3C8();
+    // 생년/졸년 간지 실시간 업데이트
+    if (rowKey === "R1") setC8GanjiCell(val, "G7R1C7");
+    if (rowKey === "R3") setC8GanjiCell(val, "G7R3C7");
+    recalcC8(rowKey);
   });
 
-  G7R2C8El.addEventListener("keydown", function(e) {
+  el.addEventListener("keydown", function(e) {
     if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
-      const idx = allG7YearIds.indexOf("G7R2C8");
+      const idx = allG7YearIds.indexOf(idMap[rowKey]);
       const nextIdx = e.shiftKey
         ? (idx - 1 + allG7YearIds.length) % allG7YearIds.length
         : (idx + 1) % allG7YearIds.length;
-      const nextEl = document.getElementById(allG7YearIds[nextIdx]);
-      if (nextEl) nextEl.focus();
+      document.getElementById(allG7YearIds[nextIdx])?.focus();
     }
     if (e.key === "Escape") {
       e.preventDefault();
@@ -3408,38 +3494,19 @@ if (G7R2C8El) {
     }
   });
 
-  G7R2C8El.addEventListener("blur", function() {
+  el.addEventListener("blur", function() {
     const val = parseInt(this.textContent.trim());
     if (isNaN(val)) {
       this.innerHTML = "<br>";
-      updateG7R3C8();
+      if (rowKey === "R1") setC8GanjiCell(NaN, "G7R1C7");
+      if (rowKey === "R3") setC8GanjiCell(NaN, "G7R3C7");
     }
   });
 }
 
-// G7R1C8 변경 시에도 R3C8 재계산
-const G7R1C8El = document.getElementById("G7R1C8");
-if (G7R1C8El) G7R1C8El.addEventListener("input", updateG7R3C8);
-
-// G7R3C8 호버링 + 클립보드 복사
-const G7R3C8Display = document.getElementById("G7R3C8");
-if (G7R3C8Display) {
-  G7R3C8Display.style.cursor = "pointer";
-  G7R3C8Display.addEventListener("mouseenter", function() {
-    this.style.color = "var(--color-text-red-copy)";
-    this.style.fontWeight = "bold";
-  });
-  G7R3C8Display.addEventListener("mouseleave", function() {
-    this.style.color = "var(--color-text-green)";
-    this.style.fontWeight = "normal";
-  });
-  G7R3C8Display.addEventListener("click", function() {
-    const text = this.textContent.trim();
-    if (text) navigator.clipboard.writeText(text)
-      .then(() => console.log("G7R3C8 복사:", text))
-      .catch(err => console.error("복사 실패:", err));
-  });
-}
+attachC8Events("R1");        // 생년 (제한 없음)
+attachC8Events("R2", 150);  // 향년 (최대 150)
+attachC8Events("R3");        // 졸년 (제한 없음)
 
 // ===== G7 C9/C10 단기↔서기 변환 =====
 // G7R1C9/C10: C10=서기 입력 → C9=단기(서기+2333) 표시
@@ -3505,8 +3572,11 @@ G7ConvPairs.forEach(({ inputId, displayId, convert, label }) => {
 });
 
 // 초기값 설정
-document.getElementById("G7R2C8").textContent = 48;
-updateG7R3C8();
+// 초기값 설정 (생년 + 향년 → 졸년 자동계산)
+document.getElementById("G7R1C8").textContent = 1625;
+document.getElementById("G7R2C8").textContent = 45;
+lastEditedC8 = ["R1","R2"];
+recalcC8("R2");
 document.getElementById("G7R1C10").textContent = 1840;
 document.getElementById("G7R2C10").textContent = 4190;
 updateG7Conv("G7R1C10", v => v + 2333, "G7R1C9");
@@ -3653,7 +3723,7 @@ const allG7YearIds = [
   "G7R1C2","G7R2C2",
   "G7R1C4","G7R2C4",
   "G7R1C6","G7R2C6",
-  "G7R1C8","G7R2C8",
+  "G7R1C8","G7R2C8","G7R3C8",
   "G7R1C10","G7R2C10",
 ];
 allG7Pairs.forEach(([ganjiId, yearId]) => {
