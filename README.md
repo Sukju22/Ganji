@@ -25,8 +25,27 @@
 ---
 
 ## 라이선스
-이 프로젝트는 **MIT License** 하에 배포됩니다.  
-- 자유롭게 사용, 수정, 배포, 상업적 이용 가능  
-- 단, 저작권 표시(이 README 포함)는 유지해야 합니다.
+# index.html
+
+index.html is a free HTML tool.
+
+Anyone can use, modify, and distribute this file.
+
+## License
+
+This project is licensed under  
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+
+You may:
+- Use the file
+- Modify it
+- Share it
+
+You may NOT:
+- Sell this file
+- Sell modified versions of this file
+
+License details:
+https://creativecommons.org/licenses/by-nc/4.0/
 
 ---
