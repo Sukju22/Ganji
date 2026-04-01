@@ -36,24 +36,34 @@ Font files for Malgun Gothic are not distributed with this project.
 ---
 
 ---
-## License
+# License
 
-The following files are provided as free HTML tools:
-* `index.html`
-* All associated `Ganji_v*.html` (versioned) files
+## Software Tools Covered
+The following files are provided and governed by the terms of this license:
+* `index.html`: A free-to-use HTML tool.
+* **All associated `Ganji_v*.html` (versioned) files**: Including all previous and subsequent versions of the Ganji series.
 
-You are free to:
-- Use
-- Modify
-- Distribute
+---
 
-You may NOT:
-- Sell this file
-- Sell modified versions of this file
+## Terms of Service and Permissions
+By using these files, you are granted the following permissions and must adhere to the following restrictions:
 
-This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+### 1. You are free to:
+* **Use**: You may use these tools for personal or internal business purposes without any charge.
+* **Modify**: You are permitted to adapt, remix, or transform the original source code to better suit your specific needs.
+* **Distribute**: You may share, copy, and redistribute the original or modified material in any medium or format.
 
-License details:
-https://creativecommons.org/licenses/by-nc/4.0/
+### 2. You may NOT:
+* **Sell this file**: You are strictly prohibited from selling the original files or charging users to access them.
+* **Sell modified versions**: You may not sell any versions of this file that you have modified, edited, or built upon. Commercial sale of this software is a direct violation of this license.
+
+---
+
+## Official License Information
+This project and its associated files are licensed under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.
+
+To view a full copy of this license and understand your legal rights and obligations, please visit the official Creative Commons website at the link below:
+
+**License Details:** [https://creativecommons.org/licenses/by-nc/4.0/](https://creativecommons.org/licenses/by-nc/4.0/)
 
 ---
