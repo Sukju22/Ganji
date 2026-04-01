@@ -12,7 +12,7 @@
 ### 1. GitHub에서 파일 다운로드
 1. 저장소 방문: [https://github.com/Sukju22/Ganji](https://github.com/Sukju22/Ganji)  
 2. `index.html` 파일 다운로드
-3. `Ganji_v` 버전 표시가 파일을 다운로드 받아도 됩니다.(`index.html` 같은 내용의 파일입니다.)
+3. `Ganji_v` 버전 표시가 파일을 다운로드 받아도 됩니다.(`index.html` 와 같은 내용의 파일입니다.)
 
 ### 2. 브라우저에서 열기
 - 다운로드한 `index.html` 파일 더블 클릭  
