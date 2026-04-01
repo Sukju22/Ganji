@@ -38,7 +38,9 @@ Font files for Malgun Gothic are not distributed with this project.
 ---
 ## License
 
-The `index.html` and all associated `Ganji_v*.html` (versioned) files are free HTML tools.
+The following files are provided as free HTML tools:
+* `index.html`
+* All associated `Ganji_v*.html` (versioned) files
 
 You are free to:
 - Use
