@@ -1,69 +1,69 @@
 # Ganji HTML Project
 
-## 프로젝트 소개
-간지를 왕의 치세년도에 따른 년도로 쉽게 찾을 수 있도록 하기 위해 만들었습니다.
-브라우저에서 열어 바로 확인할 수 있으며, GitHub Pages를 통해 웹페이지 형태로도 접근 가능합니다.
-데스크 탑을 기준으로 해서 작성이 되었기에 휴대폰에서는 사용하기 불편합니다.
-그러나 화면이 큰 타블렛에서는 잘 보입니다.
----
+## Introduction
+The **Ganji HTML Project** was created to help users easily find the "Ganji" (Sexagenary Cycle) based on the regnal years of kings. 
+The tool can be opened directly in any web browser and is also accessible as a web page via GitHub Pages.
 
-## 사용 방법
-
-### 1. GitHub에서 파일 다운로드
-1. 저장소 방문: [https://github.com/Sukju22/Ganji](https://github.com/Sukju22/Ganji)  
-2. `index.html` 파일 다운로드
-3. `Ganji_v` 버전 표시가 파일을 다운로드 받아도 됩니다.(`index.html` 과 같은 내용의 파일입니다.)
-
-### 2. 브라우저에서 열기
-- 다운로드한 `index.html` 파일 더블 클릭  
-- 또는 Chrome / Edge / Firefox / Safari 등 브라우저에서는 아래 주소로 접속하면 됩니다.
-
-### 3. GitHub Pages 이용
-- 웹페이지 주소: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)  
-- 항상 최신 버전이 `index.html`로 열림
+**Note:** This project is optimized for **desktop** use. While it may be difficult to use on small mobile screens, it displays well on large tablets.
 
 ---
+
+## How to Use
+
+### 1. Download Files from GitHub
+1. Visit the repository: [https://github.com/Sukju22/Ganji](https://github.com/Sukju22/Ganji)
+2. Download the `index.html` file.
+3. You may also download files labeled with `Ganji_v` versions (these contain the same content as `index.html`).
+
+### 2. Open in Browser
+- Double-click the downloaded `index.html` file.
+- Alternatively, you can open it in any modern browser such as Chrome, Edge, Firefox, or Safari.
+
+### 3. Using GitHub Pages (Online)
+- Web Address: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)
+- This link always opens the latest version of `index.html`.
+
+---
+
 ## Fonts
 
-This project uses the following fonts:
+This project utilizes the following fonts:
 
-- D2Coding — licensed under the SIL Open Font License 1.1
-  - https://github.com/naver/d2codingfont/releases
-  - [https://d2.naver.com/news/6492529](https://github.com/naver/d2codingfont)
-- Malgun Gothic — system font provided by Microsoft Windows
+- **D2Coding** — Licensed under the SIL Open Font License 1.1
+  - [Releases](https://github.com/naver/d2codingfont/releases)
+  - [Official Info](https://github.com/naver/d2codingfont)
+- **Malgun Gothic** — A system font provided by Microsoft Windows.
 
-Font files for Malgun Gothic are not distributed with this project.
+*Note: Font files for Malgun Gothic are not distributed with this project.*
+
 ---
 
----
-# License
+## License
 
-## Software Tools Covered
+### Software Tools Covered
 The following files are provided and governed by the terms of this license:
 * `index.html`: A free-to-use HTML tool.
 * **All associated `Ganji_v*.html` (versioned) files**: Including all previous and subsequent versions of the Ganji series.
 
 ---
 
-## Terms of Service and Permissions
+### Terms of Service and Permissions
 By using these files, you are granted the following permissions and must adhere to the following restrictions:
 
-### 1. You are free to:
+#### 1. You are free to:
 * **Use**: You may use these tools for personal or internal business purposes without any charge.
 * **Modify**: You are permitted to adapt, remix, or transform the original source code to better suit your specific needs.
 * **Distribute**: You may share, copy, and redistribute the original or modified material in any medium or format.
 
-### 2. You may NOT:
+#### 2. You may NOT:
 * **Sell this file**: You are strictly prohibited from selling the original files or charging users to access them.
 * **Sell modified versions**: You may not sell any versions of this file that you have modified, edited, or built upon. Commercial sale of this software is a direct violation of this license.
 
 ---
 
-## Official License Information
+### Official License Information
 This project and its associated files are licensed under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.
 
 To view a full copy of this license and understand your legal rights and obligations, please visit the official Creative Commons website at the link below:
 
 **License Details:** [https://creativecommons.org/licenses/by-nc/4.0/](https://creativecommons.org/licenses/by-nc/4.0/)
-
----
