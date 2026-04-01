@@ -15,7 +15,7 @@
 
 가장 빠르고 간편한 방법입니다. 별도의 다운로드 없이 항상 최신 버전을 사용할 수 있습니다.
 
-    주소: [https://Sukju22.github.io/Ganji/]
+    주소: [Sukju22.github.io/Ganji/]
 
 # 방법 2. PC에 다운로드하여 실행하기
 
