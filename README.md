@@ -7,38 +7,19 @@
 그러나 화면이 큰 타블렛에서는 잘 보입니다.
 ---
 
-🚀 사용 방법 (How to Use)
+## 사용 방법
 
-이 프로젝트는 별도의 설치 없이 웹 브라우저만 있으면 어디서든 실행할 수 있습니다.
+### 1. GitHub에서 파일 다운로드
+1. 저장소 방문: [https://github.com/Sukju22/Ganji](https://github.com/Sukju22/Ganji)  
+2. `index.html` 파일 다운로드
 
-# 방법 1. 웹에서 바로 접속 (권장)
+### 2. 브라우저에서 열기
+- 다운로드한 `index.html` 파일 더블 클릭  
+- 또는 Chrome / Edge / Firefox / Safari 등 브라우저에서는 아래 주소로 접속하면 됩니다.
 
-가장 빠르고 간편한 방법입니다. 별도의 다운로드 없이 항상 최신 버전을 사용할 수 있습니다.
-
-    주소: [Sukju22.github.io/Ganji/]
-
-# 방법 2. PC에 다운로드하여 실행하기
-
-인터넷 연결이 없는 환경에서 사용하거나, 파일을 개인적으로 보관하고 싶을 때 사용합니다.
-
-    저장소 방문: GitHub 저장소 바로가기
-
-    파일 다운로드: 아래 두 파일 중 하나만 받으시면 됩니다. (내용은 동일합니다.)
-
-        index.html: 현재 배포 중인 표준 버전입니다.
-
-        Ganji_v1.0.1.html: 버전 관리 및 기록을 위해 생성된 파일입니다.
-
-    실행: 다운로드한 파일을 더블 클릭하면 Chrome, Edge, Safari 등 브라우저에서 즉시 열립니다.
-
-💡 참고 사항
-
-    업데이트: 새로운 기능이 추가되면 index.html에 즉시 반영됩니다. 웹 접속 시 항상 최신판을 보실 수 있습니다.
-
-    호환성: 최신 버전의 Chrome, Edge, Firefox, Safari 브라우저 사용을 권장합니다.
-
-
-
+### 3. GitHub Pages 이용
+- 웹페이지 주소: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)  
+- 항상 최신 버전이 `index.html`로 열림
 
 ---
 ## Fonts
@@ -56,7 +37,7 @@ Font files for Malgun Gothic are not distributed with this project.
 ---
 ## License
 
-`index.html` and `Ganji_vx.x.x.html` are free HTML tool.
+`index.html` is a free HTML tool.
 
 You are free to:
 - Use
