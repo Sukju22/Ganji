@@ -15,14 +15,14 @@
 2. `index.html` 파일을 다운로드합니다.
 3. `Ganji_v`로 시작하는 버전 표시 파일들을 다운로드하여 사용해도 무방합니다. (내용은 `index.html`과 동일합니다.)
 
-### 2. 브라우저에서 실행
-- 다운로드한 `index.html` 파일을 더블 클릭하여 실행합니다.
-- Chrome, Edge, Firefox 등 최신 브라우저를 권장합니다.
+### 2. 데스크탑 브라우저에서 실행
+* 다운로드한 `index.html` 파일을 브라우저 창으로 드래그하거나 더블 클릭하여 실행합니다.
+* Chrome, Edge, Firefox 등 최신 데스크탑 브라우저 사용을 권장합니다.
 
 ### 3. GitHub Pages (온라인 접속)
-- 웹페이지 주소: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)
-- 위 주소는 항상 최신 버전의 `index.html`로 연결됩니다.
-- Safari 에서는 온라인 접속을 해야 합니다.
+* 웹페이지 주소: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)
+* 모든 브라우저에서 접속 가능하며, 항상 최신 버전의 페이지가 유지됩니다.
+* **특히 Safari 브라우저 사용자는 원활한 실행을 위해 반드시 이 온라인 링크로 접속해 주세요.**
 
 ---
 
