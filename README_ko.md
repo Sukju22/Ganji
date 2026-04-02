@@ -17,11 +17,12 @@
 
 ### 2. 브라우저에서 실행
 - 다운로드한 `index.html` 파일을 더블 클릭하여 실행합니다.
-- Chrome, Edge, Firefox, Safari 등 최신 브라우저를 권장합니다.
+- Chrome, Edge, Firefox 등 최신 브라우저를 권장합니다.
 
 ### 3. GitHub Pages (온라인 접속)
 - 웹페이지 주소: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)
 - 위 주소는 항상 최신 버전의 `index.html`로 연결됩니다.
+- Safari 에서는 온라인 접속을 해야 합니다.
 
 ---
 
