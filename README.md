@@ -15,13 +15,14 @@ The tool can be opened directly in any web browser and is also accessible as a w
 2. Download the `index.html` file.
 3. You may also download files labeled with `Ganji_v` versions (these contain the same content as `index.html`).
 
-### 2. Open in Browser
-- Double-click the downloaded `index.html` file.
-- Alternatively, you can open it in any modern browser such as Chrome, Edge, Firefox, or Safari.
+### 2. Run on Desktop Browser
+* Open the downloaded `index.html` file by dragging it into your desktop browser or double-clicking it.
+* Modern desktop browsers such as Chrome, Edge, or Firefox are recommended.
 
-### 3. Using GitHub Pages (Online)
-- Web Address: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)
-- This link always opens the latest version of `index.html`.
+### 3. GitHub Pages (Online Access)
+* Web Address: [https://Sukju22.github.io/Ganji/](https://Sukju22.github.io/Ganji/)
+* This link is accessible via any browser and always hosts the latest version of the page.
+* **In particular, Safari users are highly encouraged to use this online link for the best compatibility.**
 
 ---
 
