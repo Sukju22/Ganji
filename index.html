@@ -12,7 +12,7 @@
 </script>
 <!-- 
   제작자: Sukju Lee
-  제작일: 2026-03-30
+  제작일: 2026-04-06
   설명: 육십갑자 구조 - 중국/한국 왕조 연도 조회
   라이선스: 상업적, 개인적 용도로 자유롭게 사용 가능합니다. 단, 판매는 금지합니다.
 -->
@@ -49,8 +49,8 @@
   /* ----------------------------------------
      버전
   ---------------------------------------- */
-  --version:              "v1.0.2"; /* 버전 넘버 */
-  --version-opacity:      0.3;      /* G3C3 버전 텍스트 투명도 (30%) */
+  --version:              "v1.0.3"; /* 버전 넘버 */
+  --version-opacity:      0.3;      /* G3C4 버전 텍스트 투명도 (30%) */
   --g3c1-opacity:         0.3;      /* G3C1 인덱스 숫자 투명도 (30%) */
 
   /* ----------------------------------------
@@ -115,12 +115,12 @@
   --g3-line-height:            1;     /* G3 줄 높이 (수직 중앙 정렬용) */
   --g3-padding-top:            2px;   /* G3 전체 기본 수직 보정값 */
   --g3c1-padding-top:          2px;   /* G3C1 간지 인덱스 (-/숫자) 개별 보정값 */
-  --g3c3-padding-top:          2px;   /* G3C3 서기 연도 숫자 개별 보정값 */
-  --g3c4-padding-top:          2px;   /* G3C4 왕조 표시 (2칸) 개별 보정값 */
-  --g3c5-padding-top:          2px;   /* G3C5 왕조 한자 개별 보정값 */
-  --g3c6-padding-top:          2px;   /* G3C6 왕조 시작 연도 개별 보정값 */
-  --g3c7-padding-top:          2px;   /* G3C7 왕조 끝 연도 개별 보정값 */
-  --g3c8-padding-top:          2px;   /* G3C8 치세 년수 개별 보정값 */
+  --g3c4-padding-top:          2px;   /* G3C4 서기 연도 숫자 개별 보정값 */
+  --g3c5-padding-top:          2px;   /* G3C5 왕조 표시 (2칸) 개별 보정값 */
+  --g3c6-padding-top:          2px;   /* G3C6 왕조 한자 개별 보정값 */
+  --g3c7-padding-top:          2px;   /* G3C7 왕조 시작 연도 개별 보정값 */
+  --g3c8-padding-top:          2px;   /* G3C8 왕조 끝 연도 개별 보정값 */
+  --g3c9-padding-top:          2px;   /* G3C9 치세 년수 개별 보정값 */
   --g3-yearinput-font-size:    14px;  /* G3 yearInput 폰트 크기 */
   --g3-yearinput-font-family:  'D2Coding', "Malgun Gothic", "맑은 고딕", monospace; /* G3 yearInput 폰트 */
   --g3-yearinput-font-weight:  normal;  /* G3 yearInput 폰트 굵기 */
@@ -301,7 +301,7 @@ body {
   line-height: var(--g3-line-height);
 }
 
-/* G3C4 (4번째 셀, 2칸) */
+/* G3C5 (4번째 셀, 2칸) */
 .G3 .grid10 .box:nth-child(4) {
   font-size: var(--g3-font-size);
   font-family: var(--g3-font-family);
@@ -313,18 +313,33 @@ body {
 }
 
 /* G3 나머지 셀 검정 */
-#G3C3, #G3C5, #G3C6, #G3C7, #G3C8 {
+#G3C4, #G3C6, #G3C7, #G3C8, #G3C9 {
   color: var(--color-text-default) !important;
 }
 
 /* G3 셀별 개별 padding-top 보정 */
 #G3C1 { padding-top: var(--g3c1-padding-top); opacity: var(--g3c1-opacity); } /* 간지 인덱스 (-/숫자) */
-#G3C3 { padding-top: var(--g3c3-padding-top); } /* 서기 연도 숫자 */
-#G3C4 { padding-top: var(--g3c4-padding-top); } /* 왕조 표시 (2칸) */
-#G3C5 { padding-top: var(--g3c5-padding-top); } /* 왕조 한자 */
-#G3C6 { padding-top: var(--g3c6-padding-top); } /* 왕조 시작 연도 */
-#G3C7 { padding-top: var(--g3c7-padding-top); } /* 왕조 끝 연도 */
-#G3C8 { padding-top: var(--g3c8-padding-top); } /* 치세 년수 */
+#G3C4 { padding-top: var(--g3c4-padding-top); } /* 서기 연도 숫자 */
+#G3C5 { padding-top: var(--g3c5-padding-top); white-space: nowrap; overflow: hidden; font-size: 11px; } /* 왕조 표시 (2칸) — nowrap으로 두 줄 방지 */
+#G3C6 { padding-top: var(--g3c6-padding-top); } /* 왕조 한자 */
+#G3C7 { padding-top: var(--g3c7-padding-top); } /* 왕조 시작 연도 */
+#G3C8 { padding-top: var(--g3c8-padding-top); } /* 왕조 끝 연도 */
+#G3C9 { padding-top: var(--g3c9-padding-top); } /* 치세 년수 */
+
+/* G3C7·G3C8·G3C9 두 줄 표시 (충숙왕·충혜왕 전용) */
+#G3C7.g3-paired, #G3C8.g3-paired, #G3C9.g3-paired {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 0 !important;
+  line-height: 1.15;
+}
+#G3C7.g3-paired span, #G3C8.g3-paired span, #G3C9.g3-paired span {
+  font-size: 9px;
+  line-height: 1.2;
+  display: block;
+  text-align: center;
+}
 
 
 /* =============================
@@ -585,6 +600,10 @@ body {
 .G7 .grid10:last-child .box {
   border-bottom: none;
 }
+/* G7R2C9, G7R2C10 커서 기본값 고정 */
+#G7R2C9, #G7R2C10 {
+  cursor: default;
+}
 /* G7 줄 사이 경계 — 위 줄의 box border-bottom 제거 (grid10 외곽 2px와 중복 방지) */
 .G7 .grid10:not(:last-child) .box {
   border-bottom: none;
@@ -614,8 +633,8 @@ body {
   background: var(--g7-focus-bg);
   outline: 2px solid var(--color-border-red);
 }
-/* 클립 복사 셀 — G7R1C9, G7R2C9 */
-#G7R1C9, #G7R2C9 {
+/* 클립 복사 셀 — G7R1C9 */
+#G7R1C9 {
   color: var(--g7-color-clip);
 }
 /* 입력 가능 셀 — G7R3C8 (졸년) */
@@ -623,7 +642,7 @@ body {
   color: var(--g7-color-input);
 }
 /* G7 클립보드 복사 셀 호버 — 폰트 빨강 */
-#G7R1C9:hover, #G7R2C9:hover,
+#G7R1C9:hover,
 #G7R1C1:hover, #G7R1C3:hover, #G7R1C5:hover, #G7R1C7:hover,
 #G7R2C1:hover, #G7R2C3:hover, #G7R2C5:hover,
 #G7R3C7:hover {
@@ -639,13 +658,16 @@ body {
 /* G7 지정 label 셀 배경색 */
 #G7R1C1, #G7R1C3, #G7R1C5, #G7R1C7,
 #G7R2C1, #G7R2C3, #G7R2C5, #G7R2C7,
-#G7R3C7, #G7R1C9, #G7R2C9 {
+#G7R3C7 {
   background-color: #FAC090;
+}
+#G7R1C9 {
+  background-color: #94D8F6;
 }
 
 /* G7 지정 label 셀 폰트 색상 검정 */
 #G7R1C1, #G7R1C3, #G7R1C5, #G7R1C7, #G7R1C9,
-#G7R2C1, #G7R2C3, #G7R2C5, #G7R2C7, #G7R2C9,
+#G7R2C1, #G7R2C3, #G7R2C5, #G7R2C7,
 #G7R3C7 {
   color: var(--color-text-default) !important;
 }
@@ -959,13 +981,13 @@ input[type=number] { -moz-appearance:textfield; }
         <span id="yearDisplay" class="ad">2024</span>
       </div>
     </div>
-    <div class="box h1 c1" id="G3C2B"></div>
     <div class="box h1 c1" id="G3C3"></div>
-    <div class="box h1 c2" id="G3C4">왕조 표시</div>
-    <div class="box h1 c1" id="G3C5">왕조</div>
-    <div class="box h1 c1" id="G3C6">시작</div>
-    <div class="box h1 c1" id="G3C7">끝</div>
-    <div class="box h1 c1" id="G3C8">족보</div>
+    <div class="box h1 c1" id="G3C4"></div>
+    <div class="box h1 c2" id="G3C5">왕조 표시</div>
+    <div class="box h1 c1" id="G3C6">왕조</div>
+    <div class="box h1 c1" id="G3C7">시작</div>
+    <div class="box h1 c1" id="G3C8">끝</div>
+    <div class="box h1 c1" id="G3C9">족보</div>
   </div>
 </div>
 
@@ -1016,9 +1038,9 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box c1 g7-year" id="G7R1C4" contenteditable="true" tabindex="3"></div>
     <div class="box label c1" id="G7R1C5"></div>
     <div class="box c1 g7-year" id="G7R1C6" contenteditable="true" tabindex="5"></div>
-    <div class="box label c1" id="G7R1C7"></div>
+    <div class="box label c1" id="G7R1C7" style="background:#A2D869;"></div>
     <div class="box c1 g7-year" id="G7R1C8" contenteditable="true" tabindex="7"></div>
-    <div class="box c1" id="G7R1C9" style="background:#FAC090;"></div>
+    <div class="box c1" id="G7R1C9"></div>
     <div class="box c1 g7-year" id="G7R1C10" contenteditable="true" tabindex="9"></div>
   </div>
   <!-- G7 줄2 -->
@@ -1029,10 +1051,10 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box c1 g7-year" id="G7R2C4" contenteditable="true" tabindex="4"></div>
     <div class="box label c1" id="G7R2C5"></div>
     <div class="box c1 g7-year" id="G7R2C6" contenteditable="true" tabindex="6"></div>
-    <div class="box label c1" id="G7R2C7" style="font-size:14px; cursor:pointer; user-select:none;">향년<sup id="G7R2C7sup" style="font-size:8px; color:#FF0000; font-weight:bold;">-1</sup></div>
+    <div class="box label c1" id="G7R2C7" style="font-size:14px; cursor:pointer; user-select:none; background:#A2D869;">향년·수<sup id="G7R2C7sup" style="font-size:8px; color:#FF0000; font-weight:bold; display:none;"></sup></div>
     <div class="box c1 g7-year" id="G7R2C8" contenteditable="true" tabindex="8"></div>
-    <div class="box c1" id="G7R2C9" style="background:#FAC090;"></div>
-    <div class="box c1 g7-year" id="G7R2C10" contenteditable="true" tabindex="10"></div>
+    <div class="box c1" id="G7R2C9"></div>
+    <div class="box c1" id="G7R2C10"></div>
   </div>
   <!-- G7 줄3 -->
   <div class="grid10">
@@ -1042,7 +1064,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div class="box c1" id="G7R3C4"></div>
     <div class="box label c1" id="G7R3C5"></div>
     <div class="box c1" id="G7R3C6"></div>
-    <div class="box label c1" id="G7R3C7"></div>
+    <div class="box label c1" id="G7R3C7" style="background:#A2D869;"></div>
     <div class="box c1 g7-year" id="G7R3C8" contenteditable="true" tabindex="11"></div>
     <div class="box label c1" id="G7R3C9"></div>
     <div class="box c1" id="G7R3C10"></div>
@@ -1068,11 +1090,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const G3Boxes = document.querySelectorAll(".G3 .box");
   const grid = document.getElementById("ganjiGrid");
 
-  const G3C4 = document.getElementById("G3C4");//왕조
-  const G3C5 = document.getElementById("G3C5");//왕조 한자만
-  const G3C6 = document.getElementById("G3C6");//start
-  const G3C7 = document.getElementById("G3C7");//end
-  const G3C8 = document.getElementById("G3C8");//총 치세 년도
+  const G3C5 = document.getElementById("G3C5");//왕조
+  const G3C6 = document.getElementById("G3C6");//왕조 한자만
+  const G3C7 = document.getElementById("G3C7");//start
+  const G3C8 = document.getElementById("G3C8");//end
+  const G3C9 = document.getElementById("G3C9");//총 치세 년도
 
 
 
@@ -1102,8 +1124,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const cg = closestGapjaYear(year);
     return cg === year ? cg : cg + 60;
   }
-  const todayYear = new Date().getFullYear(); // 현재 연도 (2026)
-  let internalYear = nextGapjaYear(todayYear); // 2044
+  const todayYear = new Date().getFullYear();
+  let internalYear = 1444; // 초기 기본값 1444 (왕조 선택 시 자동 변경)
   let repeatInterval;
 
   function updateG4C1(){
@@ -1170,37 +1192,90 @@ function updateG3YearColor() {
     });
   }
 
-// G3C4 색상 보호 observer 제거 (모든 셀 검정으로 통일)
+// G3C5 색상 보호 observer 제거 (모든 셀 검정으로 통일)
 
-// ===== G3 cell click 클립보드 복사 (G3C4, G3C5 전용) =====
+// ===== G3 cell click 클립보드 복사 (G3C6 전용) =====
 
-// 1. 대상 셀 지정 (G3C4는 인덱스 3, G3C5는 인덱스 4)
-const copyTargets = [G3Boxes[3], G3Boxes[4]]; 
+// 1. 대상 셀 지정 (G3C6는 인덱스 5 — 왕조 한자만 복사)
+// ===== 공용 함수: 검정 배경 G4 셀 값을 공백 구분 문자열로 반환 =====
+// 클립 ON 여부는 호출 측에서 판단 — 이 함수는 순수하게 값만 수집
+function getG4BlackCellsText() {
+  const blackCells = Array.from(G4Boxes).filter(box => {
+    const bg = window.getComputedStyle(box).backgroundColor;
+    return bg === "rgb(0, 0, 0)" || bg === "rgba(0, 0, 0, 1)";
+  });
+  if (blackCells.length === 0) return "";
+  return blackCells.map(box => box.textContent.trim()).join(" ");
+}
 
-copyTargets.forEach((cell) => {
-  if (!cell) return;
+// ===== G3C5 Ctrl+클릭: 복합 클립보드 복사 =====
+(function() {
+  const g3c5 = G3Boxes[4]; // G3C5: 왕조 표시 (2칸)
+  if (!g3c5) return;
+  g3c5.style.cursor = "pointer";
 
-  cell.addEventListener("click", () => {
-    const text = cell.textContent.trim();
-    
-    // 빈 값이 아닐 때만 복사 실행
-    if (text && text !== "-" && text !== "왕조 표시") {
-      navigator.clipboard.writeText(text)
+  g3c5.addEventListener("click", (e) => {
+    const g3c5Text = g3c5.textContent.trim();
+    if (!g3c5Text || g3c5Text === "왕조 표시") return;
+
+    if (e.ctrlKey) {
+      // ── Ctrl + 클릭: G3C5 + G6선택한자 + 검정G4셀 → 클립보드
+    const g4Values = getG4BlackCellsText();
+    if (!g4Values) return; // 검정 G4 없으면 중단
+
+    // 2. G6 선택된 셀의 한자 영역 텍스트
+    const g6HanjaText = selectedCell
+      ? (selectedCell.querySelector(".hanjaBox")?.textContent.trim() || "")
+      : "";
+
+    // 3. 조합: G3C5 + G6한자 + G4검정셀 (각 사이 빈칸 하나)
+    const parts = [g3c5Text, g6HanjaText, g4Values].filter(v => v);
+    const copyText = parts.join(" ");
+
+    navigator.clipboard.writeText(copyText)
+      .then(() => {
+        console.log(`G3C5 Ctrl복사: ${copyText}`);
+        const orig = g3c5.style.backgroundColor;
+        g3c5.style.backgroundColor = "var(--color-bg-yellow-dark)";
+        setTimeout(() => { g3c5.style.backgroundColor = orig; }, 150);
+      })
+      .catch(err => console.error("복사 실패:", err));
+
+    } else {
+      // ── 일반 클릭: G3C5 내용 복사
+      navigator.clipboard.writeText(g3c5Text)
         .then(() => {
-          console.log(`G3 복사 완료: ${text}`);
-          
-          // 시각적 피드백 (선택 사항: 클릭 시 잠시 배경색 변경)
-          const originalBg = cell.style.backgroundColor;
-          cell.style.backgroundColor = "var(--color-bg-btn)";
-          setTimeout(() => {
-            cell.style.backgroundColor = originalBg;
-          }, 100);
+          console.log(`G3C5 복사: ${g3c5Text}`);
+          const orig = g3c5.style.backgroundColor;
+          g3c5.style.backgroundColor = "var(--color-bg-btn)";
+          setTimeout(() => { g3c5.style.backgroundColor = orig; }, 100);
         })
         .catch(err => console.error("복사 실패:", err));
     }
   });
+})();
 
-  // 클릭 가능한 셀임을 알리기 위해 커서 스타일 변경
+// ===== G3C6 일반 클릭: 한자만 복사 (기존) =====
+const copyTargets = [G3Boxes[5]]; // G3C6: 왕조 한자만
+
+copyTargets.forEach((cell) => {
+  if (!cell) return;
+
+  cell.addEventListener("click", (e) => {
+    if (e.ctrlKey) return; // Ctrl+클릭은 무시
+    const text = cell.textContent.trim();
+    if (!text || text === "왕조 표시") return;
+
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log(`G3 복사 완료: ${text}`);
+        const originalBg = cell.style.backgroundColor;
+        cell.style.backgroundColor = "var(--color-bg-btn)";
+        setTimeout(() => { cell.style.backgroundColor = originalBg; }, 100);
+      })
+      .catch(err => console.error("복사 실패:", err));
+  });
+
   cell.style.cursor = "pointer";
 });
 
@@ -1633,6 +1708,96 @@ function getG6CopyText(hanjaText, korText, isOnHanja, isCtrl, isAlt) {
   menu.appendChild(row3);
   menu.appendChild(row4);
 
+  // ── G4 복사모드 섹션 ──
+  const partSep3 = document.createElement("div");
+  partSep3.style.cssText = `border-top: 2px solid rgba(255,255,255,0.3); margin: 4px 0 0 0;`;
+  menu.appendChild(partSep3);
+
+  const part3Header = document.createElement("div");
+  part3Header.style.cssText = `
+    padding: 2px 10px; font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    letter-spacing: 1px;
+  `;
+  part3Header.textContent = "── G4 복사모드 ──";
+  menu.appendChild(part3Header);
+
+  // G4 복사모드 상태: "none" | "merge" | "split"
+  window.g4CopyMode = window.g4CopyMode || "none";
+  window.g4SplitDelay = window.g4SplitDelay || 150;
+
+  const g4ModeRow = document.createElement("div");
+  g4ModeRow.style.cssText = `display:flex; align-items:center; padding:4px 10px; gap:5px; flex-wrap:nowrap;`;
+
+  function makeG4ModeBtn(label) {
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.style.cssText = `
+      padding:1px 6px; font-size:10px; cursor:pointer;
+      border:1px solid rgba(255,255,255,0.4); border-radius:3px;
+      background:rgba(255,255,255,0.15); color:#fff; white-space:nowrap;
+    `;
+    return b;
+  }
+
+  const btnG4None  = makeG4ModeBtn("G4없음");
+  const btnG4Merge = makeG4ModeBtn("G6+G4");
+  const btnG4Split = makeG4ModeBtn("분리");
+
+  // 분리 모드 ms 입력 행
+  const g4DelayRow = document.createElement("div");
+  g4DelayRow.style.cssText = `display:flex; align-items:center; padding:2px 10px 4px 10px; gap:5px;`;
+  g4DelayRow.innerHTML = `<span style="font-size:10px;color:rgba(255,255,255,0.5);">간격:</span>`;
+
+  const g4DelayInput = document.createElement("input");
+  g4DelayInput.type = "number";
+  g4DelayInput.min  = "10";
+  g4DelayInput.max  = "2000";
+  g4DelayInput.value = window.g4SplitDelay;
+  g4DelayInput.style.cssText = `
+    width:52px; font-size:11px; padding:1px 4px;
+    background:#222; color:#fff;
+    border:1px solid rgba(255,255,255,0.4); border-radius:3px;
+    text-align:right;
+  `;
+  g4DelayInput.addEventListener("click",  e => e.stopPropagation());
+  g4DelayInput.addEventListener("mousedown", e => e.stopPropagation());
+  g4DelayInput.addEventListener("change", e => {
+    const v = parseInt(g4DelayInput.value);
+    if (!isNaN(v) && v >= 10) window.g4SplitDelay = v;
+    else g4DelayInput.value = window.g4SplitDelay;
+  });
+  g4DelayRow.appendChild(g4DelayInput);
+  g4DelayRow.appendChild(Object.assign(document.createElement("span"), {
+    textContent: "ms",
+    style: "font-size:10px;color:rgba(255,255,255,0.5);"
+  }));
+
+  function updateG4ModeUI() {
+    const m = window.g4CopyMode;
+    btnG4None.style.background  = m === "none"  ? "var(--color-bg-yellow-dark)" : "rgba(255,255,255,0.15)";
+    btnG4None.style.color       = m === "none"  ? "#000" : "#fff";
+    btnG4Merge.style.background = m === "merge" ? "var(--color-bg-yellow-dark)" : "rgba(255,255,255,0.15)";
+    btnG4Merge.style.color      = m === "merge" ? "#000" : "#fff";
+    btnG4Split.style.background = m === "split" ? "var(--color-bg-yellow-dark)" : "rgba(255,255,255,0.15)";
+    btnG4Split.style.color      = m === "split" ? "#000" : "#fff";
+    g4DelayRow.style.display    = m === "split" ? "flex" : "none";
+  }
+
+  btnG4None.addEventListener("click",  e => { e.stopPropagation(); window.g4CopyMode = "none";  updateG4ModeUI(); });
+  btnG4Merge.addEventListener("click", e => { e.stopPropagation(); window.g4CopyMode = "merge"; updateG4ModeUI(); });
+  btnG4Split.addEventListener("click", e => { e.stopPropagation(); window.g4CopyMode = "split"; updateG4ModeUI(); });
+
+  g4ModeRow.appendChild(btnG4None);
+  g4ModeRow.appendChild(btnG4Merge);
+  g4ModeRow.appendChild(btnG4Split);
+
+  menu.appendChild(g4ModeRow);
+  menu.appendChild(g4DelayRow);
+  updateG4ModeUI();
+
   document.body.appendChild(menu);
 
   // 메뉴 닫기 — setTimeout으로 현재 이벤트 사이클 이후에 등록
@@ -1684,7 +1849,7 @@ cells.forEach((cell, index) => {
   // ===== G6 셀 클릭 이벤트 =====
   cell.addEventListener("click", function(event) {
 
-    // ----- 클립보드 복사 처리 -----
+    // ----- 클립보드 복사 준비: 영역 판정 (DOM 업데이트 전에 측정) -----
     const hanjaText = hanja.textContent.trim();
     const korText   = kor.textContent.trim();
     const hanjaRect = hanja.getBoundingClientRect();
@@ -1693,17 +1858,11 @@ cells.forEach((cell, index) => {
     const isOnKor   = event.clientY >= korRect.top   && event.clientY < korRect.bottom;
     const isOnTop   = !isOnHanja && !isOnKor;
 
-    // topBox 클릭 시 → 클립보드 복사 없이 셀 선택만 진행
+    // G6 복사 텍스트 미리 계산 (클립 ON + 한자/한글 영역 클릭 시)
+    let g6CopyText = null;
     if (!isOnTop && window.g6ClipEnabled) {
-      const copyText = getG6CopyText(hanjaText, korText, isOnHanja, event.ctrlKey, event.altKey);
-      if (copyText !== null) {
-        navigator.clipboard.writeText(copyText)
-          .then(() => console.log(`G6 복사: ${copyText}`))
-          .catch(err => console.error("클립보드 복사 실패:", err));
-      }
+      g6CopyText = getG6CopyText(hanjaText, korText, isOnHanja, event.ctrlKey, event.altKey);
     }
-
-
 
     // ----- 기존 G6 클릭 처리 유지 -----
 
@@ -1724,32 +1883,9 @@ cells.forEach((cell, index) => {
     updateG3C1();
     updateG3YearColor();
 
-    // 3. 왕조 범위(G3C6~G3C7) 배경색 적용
-    const startYear = parseInt(G3C6.textContent.trim());
-    const endYear = parseInt(G3C7.textContent.trim());
-
-    if (!isNaN(startYear) && !isNaN(endYear)) {
-      const startIndex = getG6bgGanjiIndex(startYear);
-      let duration = (startYear < 0 && endYear > 0) ? (endYear - startYear - 1) : (endYear - startYear);
-      let curr = startIndex;
-      let count = 0;
-
-      while (count <= duration && count < 60) {
-        if (cells[curr]) {
-          const ch = cells[curr].querySelector(".hanjaBox");
-          const ck = cells[curr].querySelector(".korBox");
-          const ct = cells[curr].querySelector(".topBox");
-          const topOn = window.g6TopBoxEnabled !== false;
-          if (topOn) {
-            if(ct) ct.style.background = "linear-gradient(to bottom, transparent 0%, #FFD700 50%, transparent 100%)";
-          } else {
-            if(ch) ch.style.backgroundColor = "var(--g6-range-bg)";
-            if(ck) ck.style.backgroundColor = "var(--g6-range-bg)";
-          }
-        }
-        curr = (curr + 1) % 60;
-        count++;
-      }
+    // 3. 왕조 범위 배경색 적용 (쌍 왕/일반 왕 공통 — applyG6RangeConditionalFormatting 재사용)
+    if (typeof applyG6RangeConditionalFormatting === "function") {
+      applyG6RangeConditionalFormatting();
     }
 
     // 4. 클릭한 셀 강조 (폰트 효과, topBox ON이면 한자/한글 영역 밝은 노랑 배경)
@@ -1764,6 +1900,54 @@ cells.forEach((cell, index) => {
     // 5. G6bg 숫자 레이어 다시 그리기
     if (typeof updateG6bgIndicators === "function") {
       updateG6bgIndicators();
+    }
+
+    // 6. 클립보드 복사 — g4CopyMode 에 따라 분기 (DOM 확정 후)
+    if (window.g6ClipEnabled) {
+      const g4BlackText = getG4BlackCellsText();
+      const mode = window.g4CopyMode || "none";
+
+      if (mode === "none") {
+        // G4없음: G6 텍스트만 복사
+        if (g6CopyText !== null) {
+          navigator.clipboard.writeText(g6CopyText)
+            .then(() => console.log(`G6 복사: ${g6CopyText}`))
+            .catch(err => console.error("클립보드 복사 실패:", err));
+        }
+
+      } else if (mode === "merge") {
+        // G6+G4 한 줄: 공백으로 합쳐 1회 복사
+        const parts = [g6CopyText, g4BlackText].filter(v => v);
+        if (parts.length > 0) {
+          const finalText = parts.join(" ");
+          navigator.clipboard.writeText(finalText)
+            .then(() => console.log(`G6+G4 합산복사: ${finalText}`))
+            .catch(err => console.error("클립보드 복사 실패:", err));
+        }
+
+      } else if (mode === "split") {
+        // 분리: G6 먼저 → delay ms 후 G4
+        const delay = (typeof window.g4SplitDelay === "number" && window.g4SplitDelay >= 10)
+          ? window.g4SplitDelay : 150;
+        if (g6CopyText !== null) {
+          navigator.clipboard.writeText(g6CopyText)
+            .then(() => {
+              console.log(`G6 분리복사1: ${g6CopyText}`);
+              if (g4BlackText) {
+                setTimeout(() => {
+                  navigator.clipboard.writeText(g4BlackText)
+                    .then(() => console.log(`G4 분리복사2: ${g4BlackText}`))
+                    .catch(err => console.error("G4 분리복사 실패:", err));
+                }, delay);
+              }
+            })
+            .catch(err => console.error("G6 분리복사 실패:", err));
+        } else if (g4BlackText) {
+          // G6 텍스트 없을 때(topBox 클릭)는 G4만
+          navigator.clipboard.writeText(g4BlackText)
+            .catch(err => console.error("클립보드 복사 실패:", err));
+        }
+      }
     }
   });
 
@@ -1919,9 +2103,13 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
     if(val > 2025) val = 2025;
     val = closestGapjaYear(val);
     internalYear = val;
+    // selectedCellIndex가 null이면 임시로 0 사용해서 G4 갱신
+    const prevIndex = selectedCellIndex;
+    if(selectedCellIndex === null) selectedCellIndex = 0;
     updateG4C1();
     updateG4Cells();
     updateG5Cells();
+    selectedCellIndex = prevIndex; // 원래 상태 복원
     updateG3YearColor();
     updateYearDisplay(val);
   }
@@ -2133,28 +2321,34 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
   updateG4Cells();
   updateG5Cells();
   updateG3C1();
-  updateYearInput(internalYear);
+  // 초기값 1444 직접 세팅 (updateYearInput의 2025 상한 제한을 우회)
+  internalYear = 1444;
+  selectedCellIndex = 0; // 1444는 갑자년 = 인덱스 0
+  updateG4C1();
+  updateG4Cells();
+  updateG5Cells();
+  selectedCellIndex = null; // G6 선택 상태는 초기화
+  updateYearDisplay(internalYear);
 
   // ===== G2C1 select 데이터 채우기 =====
   const g2DataListC1 = [
     {id:"明01", era:"홍무(洪武)", start:1368, end:1398},
     {id:"明02", era:"건문(建文)", start:1399, end:1402},
-    {id:"明03", era:"홍무(洪武)", start:1402, end:1402},
-    {id:"明04", era:"영락(永樂)", start:1403, end:1424},
-    {id:"明05", era:"홍희(洪熙)", start:1425, end:1425},
-    {id:"明06", era:"선덕(宣德)", start:1426, end:1435},
-    {id:"明07", era:"정통(正統)", start:1436, end:1449},
-    {id:"明08", era:"경태(景泰)", start:1450, end:1457},
-    {id:"明09", era:"천순(天順)", start:1457, end:1464},
-    {id:"明10", era:"성화(成化)", start:1465, end:1487},
-    {id:"明11", era:"홍치(弘治)", start:1488, end:1505},
-    {id:"明12", era:"정덕(正德)", start:1506, end:1521},
-    {id:"明13", era:"가정(嘉靖)", start:1522, end:1566},
-    {id:"明14", era:"융경(隆慶)", start:1567, end:1572},
-    {id:"明15", era:"만력(萬曆)", start:1573, end:1620},
-    {id:"明16", era:"태창(泰昌)", start:1620, end:1620},
-    {id:"明17", era:"천계(天啓)", start:1621, end:1627},
-    {id:"明18", era:"숭정(崇禎)", start:1628, end:1644},
+    {id:"明03", era:"영락(永樂)", start:1403, end:1424},
+    {id:"明04", era:"홍희(洪熙)", start:1425, end:1425},
+    {id:"明05", era:"선덕(宣德)", start:1426, end:1435},
+    {id:"明06", era:"정통(正統)", start:1436, end:1449},
+    {id:"明07", era:"경태(景泰)", start:1450, end:1457},
+    {id:"明08", era:"천순(天順)", start:1457, end:1464},
+    {id:"明09", era:"성화(成化)", start:1465, end:1487},
+    {id:"明10", era:"홍치(弘治)", start:1488, end:1505},
+    {id:"明11", era:"정덕(正德)", start:1506, end:1521},
+    {id:"明12", era:"가정(嘉靖)", start:1522, end:1566},
+    {id:"明13", era:"융경(隆慶)", start:1567, end:1572},
+    {id:"明14", era:"만력(萬曆)", start:1573, end:1620},
+    {id:"明15", era:"태창(泰昌)", start:1620, end:1620},
+    {id:"明16", era:"천계(天啓)", start:1621, end:1627},
+    {id:"明17", era:"숭정(崇禎)", start:1628, end:1644},
     
     {id:"淸01", era:"숭덕(崇德)", start:1636, end:1643},
     {id:"淸02", era:"순치(順治)", start:1644, end:1661},
@@ -2195,10 +2389,10 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
   {id:"고려24", era:"원종(元宗)", start:1259, end:1274},
   {id:"고려25", era:"충렬왕(忠烈王)", start:1274, end:1308},
   {id:"고려26", era:"충선왕(忠宣王)", start:1308, end:1313},
-  {id:"고려27", era:"충숙왕1(忠肅王)", start:1313, end:1330},
-  {id:"고려28", era:"충혜왕1(忠惠王)", start:1330, end:1332},
-  {id:"고려29", era:"충숙왕2(忠肅王)", start:1332, end:1339},
-  {id:"고려30", era:"충혜왕2(忠惠王)", start:1339, end:1344},
+  {id:"고려27", era:"충숙왕1(忠肅王)", start:1313, end:1330, paired:"충숙왕", pairIdx:1, pairOther:{start:1332, end:1339}},
+  {id:"고려28", era:"충혜왕1(忠惠王)", start:1330, end:1332, paired:"충혜왕", pairIdx:1, pairOther:{start:1339, end:1344}},
+  {id:"고려29", era:"충숙왕2(忠肅王)", start:1332, end:1339, paired:"충숙왕", pairIdx:2, pairOther:{start:1313, end:1330}},
+  {id:"고려30", era:"충혜왕2(忠惠王)", start:1339, end:1344, paired:"충혜왕", pairIdx:2, pairOther:{start:1330, end:1332}},
   {id:"고려31", era:"충목왕(忠穆王)", start:1344, end:1348},
   {id:"고려32", era:"충정왕(忠定王)", start:1348, end:1351},
   {id:"고려33", era:"공민왕(恭愍王)", start:1351, end:1374},
@@ -2294,6 +2488,7 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
       const eraDisplay = reign >= 60
         ? item.era.replace(/\(([^)]+)\)/, `<span class="over60-paren" style="color:${markerColor};">(</span><span class="over60-hanja" style="color:${markerColor};">$1</span><span class="over60-paren" style="color:${markerColor};">)</span>`)
         : item.era;
+      // 쌍 왕도 목록에서는 원본 형식 그대로 표시 (item.start-item.end)
       opt.innerHTML = `<span style="font-size:var(--g2-option-id-font-size); vertical-align:middle;">${item.id}</span> ${eraDisplay} ${item.start}-${item.end}`;
 
       // 60년 이상 — 호버 시 괄호+한자 색상 변경 (인라인 스타일 직접 제어)
@@ -2311,7 +2506,10 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
         e.preventDefault();
         list.querySelectorAll(".g2-option").forEach(o => o.classList.remove("selected"));
         opt.classList.add("selected");
-        selected.textContent = `${item.era}`;
+        // 쌍 왕은 선택 표시에서 숫자 제거 (충숙왕1 → 충숙왕)
+        selected.textContent = item.paired
+          ? item.era.replace(/([가-힣]+)\d+/, "$1")
+          : item.era;
         dropdown.classList.remove("open");
         onG2Select(item);
         // 반대쪽 드롭다운 자동 연동
@@ -2347,12 +2545,80 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
     if(k) { k.style.color = "var(--g6-selected-color)"; k.style.fontWeight = "var(--g6-selected-weight)"; }
   }
 
+  // ── G3C5 폰트 크기 자동 조정 ──
+  // 한글 2자 + 한자 2자 (= 텍스트가 "XX(XX)" 6자) 일 때 → G3 기본 폰트 크기
+  // 그 외 (더 긴 왕명) → 11px 고정
+  function adjustG3C5FontSize(text) {
+    const kor   = (text.match(/[가-힣]/g)  || []).length;
+    const hanja = (text.match(/[\u4E00-\u9FFF]/g) || []).length;
+    G3C5.style.fontSize = (kor === 2 && hanja === 2)
+      ? "var(--g3-font-size)"
+      : "11px";
+  }
+
   function onG2Select(item) {
-    G3C4.textContent = item.era;
-    G3C5.textContent = item.era.replace(/[가-힣()]/g, "");
-    G3C6.textContent = item.start;
-    G3C7.textContent = item.end;
-    G3C8.textContent = Number(item.end) - Number(item.start) + 1;
+    if (item.paired) {
+      // ── 쌍 왕 (충숙왕 / 충혜왕) ──
+      // G3C5: 숫자 제거 (충숙왕1→충숙왕, 忠肅王 유지)
+      const eraNoNum = item.era.replace(/([가-힣]+)\d+/, "$1");
+      G3C5.textContent = eraNoNum;
+      adjustG3C5FontSize(eraNoNum);
+      // G3C6: 한자만 (숫자·한글·괄호 제거)
+      G3C6.textContent = eraNoNum.replace(/[가-힣()]/g, "");
+
+      // 두 치세 정렬 (작은 start가 위)
+      const t1 = item.pairIdx === 1
+        ? { start: item.start, end: item.end }
+        : { start: item.pairOther.start, end: item.pairOther.end };
+      const t2 = item.pairIdx === 1
+        ? { start: item.pairOther.start, end: item.pairOther.end }
+        : { start: item.start, end: item.end };
+
+      // G3C7: 두 시작연도 두 줄
+      G3C7.classList.add("g3-paired");
+      G3C7.innerHTML = `<span>${t1.start}</span><span>${t2.start}</span>`;
+      G3C7.dataset.year = String(t1.start); // range 계산용 (1치세 시작)
+
+      // G3C8: 두 끝연도 두 줄
+      G3C8.classList.add("g3-paired");
+      G3C8.innerHTML = `<span>${t1.end}</span><span>${t2.end}</span>`;
+      G3C8.dataset.year = String(t2.end); // range 계산용 (2치세 끝)
+
+      // G3C9: 두 치세년수 두 줄
+      const d1 = t1.end - t1.start + 1;
+      const d2 = t2.end - t2.start + 1;
+      G3C9.classList.add("g3-paired");
+      G3C9.innerHTML = `<span>${d1}</span><span>${d2}</span>`;
+      G3C9.dataset.pairedStart1 = t1.start;
+      G3C9.dataset.pairedEnd1   = t1.end;
+      G3C9.dataset.pairedStart2 = t2.start;
+      G3C9.dataset.pairedEnd2   = t2.end;
+
+    } else {
+      // ── 일반 왕 ──
+      G3C5.textContent = item.era;
+      adjustG3C5FontSize(item.era);
+      G3C6.textContent = item.era.replace(/[가-힣()]/g, "");
+
+      G3C7.classList.remove("g3-paired");
+      G3C7.innerHTML = "";
+      G3C7.textContent = item.start;
+      delete G3C7.dataset.year;
+
+      G3C8.classList.remove("g3-paired");
+      G3C8.innerHTML = "";
+      G3C8.textContent = item.end;
+      delete G3C8.dataset.year;
+
+      G3C9.classList.remove("g3-paired");
+      G3C9.innerHTML = "";
+      G3C9.textContent = Number(item.end) - Number(item.start) + 1;
+      delete G3C9.dataset.pairedStart1;
+      delete G3C9.dataset.pairedEnd1;
+      delete G3C9.dataset.pairedStart2;
+      delete G3C9.dataset.pairedEnd2;
+    }
+
     restoreSelectedCell();
     updateG4ConditionalFormatting();
     applyG6RangeConditionalFormatting();
@@ -2364,12 +2630,13 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
   buildG2Dropdown("g2Dropdown2", "g2Selected2", "g2List2", g2DataListC2, g2DataListC1, "g2Dropdown1", "g2Selected1", "g2List1");
 
 
-// G3C6 변경 감지
-const observerG3C6 = new MutationObserver(() => {
-  if(G3C6.textContent){
-    const yearFromG3C6 = parseInt(G3C6.textContent);
-    // 240 대신 (60 * 4)를 직접 대입하여 계산합니다.
-    internalYear = closestGapjaYear(yearFromG3C6 - (60 * 3));
+// G3C7 변경 감지
+const observerG3C7 = new MutationObserver(() => {
+  // 쌍 왕 모드: dataset.year(1치세 시작) 우선, 없으면 textContent
+  const rawYear = G3C7.dataset.year ? G3C7.dataset.year : G3C7.textContent;
+  const yearFromG3C7 = parseInt(rawYear);
+  if (!isNaN(yearFromG3C7)) {
+    internalYear = closestGapjaYear(yearFromG3C7 - (60 * 3));
 
     // 내부 연도 관련 UI 업데이트
     updateG4C1();
@@ -2385,12 +2652,25 @@ const observerG3C6 = new MutationObserver(() => {
 
 // ===== G4 조건부 서식 적용 =====
 function updateG4ConditionalFormatting() {
-  // G3C6 / G3C7 내부값 사용 (dataset.year가 있으면 우선)
-  const startYear = parseInt((G3C6.dataset && G3C6.dataset.year) ? G3C6.dataset.year : G3C6.textContent) || 0;
-  const endYear   = parseInt((G3C7.dataset && G3C7.dataset.year) ? G3C7.dataset.year : G3C7.textContent) || 0;
+  // 문제3 수정: G6 셀이 선택되지 않은 경우 G4 초기화만 하고 종료
+  if (selectedCellIndex === null) {
+    G4Boxes.forEach((box) => {
+      box.style.backgroundColor = "var(--g4-bg)";
+      box.style.color = parseInt((box.dataset && box.dataset.year) ? box.dataset.year : box.textContent) < 0
+        ? "var(--color-text-red)" : "var(--color-text-default)";
+      box.style.fontWeight = "normal";
+      box.style.fontSize = "17px";
+      box.style.fontFamily = "'D2Coding', monospace";
+      box.style.borderColor = "";
+      box.style.borderWidth = "";
+    });
+    return;
+  }
+
+  // 쌍 왕 여부 확인
+  const isPaired = G3C7.classList.contains("g3-paired");
 
   G4Boxes.forEach((box) => {
-    // 내부값 우선, 없으면 textContent
     let val = parseInt((box.dataset && box.dataset.year) ? box.dataset.year : box.textContent) || 0;
 
     // 음수 처리: 디스플레이 글자색이 빨강이면 음수
@@ -2399,11 +2679,25 @@ function updateG4ConditionalFormatting() {
       val = -Math.abs(val);
     }
 
-    if (val >= startYear && val <= endYear) {
+    // 문제2 수정: 쌍 왕은 두 치세 범위를 각각 개별 체크
+    let inRange = false;
+    if (isPaired) {
+      const s1 = parseInt(G3C9.dataset.pairedStart1) || 0;
+      const e1 = parseInt(G3C9.dataset.pairedEnd1)   || 0;
+      const s2 = parseInt(G3C9.dataset.pairedStart2) || 0;
+      const e2 = parseInt(G3C9.dataset.pairedEnd2)   || 0;
+      inRange = (val >= s1 && val <= e1) || (val >= s2 && val <= e2);
+    } else {
+      const startYear = parseInt((G3C7.dataset && G3C7.dataset.year) ? G3C7.dataset.year : G3C7.textContent) || 0;
+      const endYear   = parseInt((G3C8.dataset && G3C8.dataset.year) ? G3C8.dataset.year : G3C8.textContent) || 0;
+      inRange = val >= startYear && val <= endYear;
+    }
+
+    if (inRange) {
       box.style.backgroundColor = "var(--color-bg-black)";
       box.style.color = "var(--color-text-white)";
       box.style.fontWeight = "normal";
-      box.style.fontSize = "18.7px"; /* 17px * 1.1 */
+      box.style.fontSize = "18.7px";
       box.style.fontFamily = "'D2Coding', monospace";
       box.style.borderColor = "var(--color-bg-black)";
       box.style.borderWidth = "2px";
@@ -2415,7 +2709,7 @@ function updateG4ConditionalFormatting() {
       }
       box.style.backgroundColor = "var(--g4-bg)";
       box.style.fontWeight = "normal";
-      box.style.fontSize = "17px"; /* --g4-font-size */
+      box.style.fontSize = "17px";
       box.style.fontFamily = "'D2Coding', monospace";
       box.style.borderColor = "";
       box.style.borderWidth = "";
@@ -2423,10 +2717,10 @@ function updateG4ConditionalFormatting() {
   });
 }
 
-// G3C6 또는 G3C7 변경 시마다 G4 조건부 서식 적용
+// G3C7 또는 G3C8 변경 시마다 G4 조건부 서식 적용
 const observerG3RangeG4 = new MutationObserver(updateG4ConditionalFormatting);
-observerG3RangeG4.observe(G3C6, { childList: true, subtree: true });
 observerG3RangeG4.observe(G3C7, { childList: true, subtree: true });
+observerG3RangeG4.observe(G3C8, { childList: true, subtree: true });
 
 // G4 업데이트 이후에도 조건부 서식 적용
 const originalUpdateG4Cells = updateG4Cells;
@@ -2440,7 +2734,7 @@ updateG4ConditionalFormatting();
 
 
 // 옵저버 등록 (childList와 subtree 모두 감지)
-observerG3C6.observe(G3C6, { childList: true, subtree: true });
+observerG3C7.observe(G3C7, { childList: true, subtree: true });
 
 
 
@@ -2504,8 +2798,18 @@ function getG6bgGanjiIndex(year) {
 
 // [G6bg] 4. 핵심: 범위 배경색 및 텍스트 조건부 서식 적용 함수
 function applyG6RangeConditionalFormatting() {
-  const startYear = parseInt(G3C6.textContent.trim());
-  const endYear = parseInt(G3C7.textContent.trim());
+  const isPaired = G3C7.classList.contains("g3-paired");
+  let ranges = [];
+  if (isPaired) {
+    ranges = [
+      { start: parseInt(G3C9.dataset.pairedStart1), end: parseInt(G3C9.dataset.pairedEnd1) },
+      { start: parseInt(G3C9.dataset.pairedStart2), end: parseInt(G3C9.dataset.pairedEnd2) }
+    ];
+  } else {
+    const s = parseInt(G3C7.textContent.trim());
+    const e = parseInt(G3C8.textContent.trim());
+    if (!isNaN(s) && !isNaN(e)) ranges = [{ start: s, end: e }];
+  }
   const topOn = window.g6TopBoxEnabled !== false;
 
   // G6 모든 셀 초기화
@@ -2527,43 +2831,40 @@ function applyG6RangeConditionalFormatting() {
     if(k) { k.style.backgroundColor = "#FFFF00"; k.style.color = "var(--g6-selected-color)"; k.style.fontWeight = "var(--g6-selected-weight)"; }
   }
 
-  if (isNaN(startYear) || isNaN(endYear)) return;
+  if (ranges.length === 0) return;
 
-  const startIndex = getG6bgGanjiIndex(startYear);
-  let duration = (startYear < 0 && endYear > 0) ? (endYear - startYear - 1) : (endYear - startYear);
-  
-  let curr = startIndex;
-  for (let count = 0; count <= duration && count < 60; count++) {
-    if (cells[curr]) {
-      const h = cells[curr].querySelector(".hanjaBox");
-      const k = cells[curr].querySelector(".korBox");
-      const t = cells[curr].querySelector(".topBox");
-
-      if (topOn) {
-        // topBox ON: hanjaBox/korBox 색상 변화 없음, topBox에 그라디언트
-        if(t) t.style.background = "linear-gradient(to bottom, transparent 0%, #FFD700 50%, transparent 100%)";
-      } else {
-        // topBox OFF: 기존 hanjaBox/korBox 배경색 방식
-        if(h) h.style.backgroundColor = "var(--g6-range-bg)";
-        if(k) k.style.backgroundColor = "var(--g6-range-bg)";
-      }
-
-      // 시작점 텍스트 강조 (topBox OFF일 때만) — --g6-startcell-highlight: 1,#색상 으로 활성화
-      if (curr === startIndex && !topOn) {
-        const hlVal = getComputedStyle(document.documentElement).getPropertyValue("--g6-startcell-highlight").trim();
-        const hlParts = hlVal.split(",");
-        const hlOn = hlParts[0].trim() === "1";
-        const hlColor = hlParts[1] ? hlParts[1].trim() : "var(--g6-selected-color)";
-        if (hlOn) {
-          if(h) { h.style.color = hlColor; h.style.fontWeight = "var(--g6-selected-weight)"; }
-          if(k) { k.style.color = hlColor; k.style.fontWeight = "var(--g6-selected-weight)"; }
+  ranges.forEach(({ start: startYear, end: endYear }) => {
+    if (isNaN(startYear) || isNaN(endYear)) return;
+    const startIndex = getG6bgGanjiIndex(startYear);
+    let duration = (startYear < 0 && endYear > 0) ? (endYear - startYear - 1) : (endYear - startYear);
+    let curr = startIndex;
+    for (let count = 0; count <= duration && count < 60; count++) {
+      if (cells[curr]) {
+        const h = cells[curr].querySelector(".hanjaBox");
+        const k = cells[curr].querySelector(".korBox");
+        const t = cells[curr].querySelector(".topBox");
+        if (topOn) {
+          if(t) t.style.background = "linear-gradient(to bottom, transparent 0%, #FFD700 50%, transparent 100%)";
+        } else {
+          if(h) h.style.backgroundColor = "var(--g6-range-bg)";
+          if(k) k.style.backgroundColor = "var(--g6-range-bg)";
+        }
+        if (curr === startIndex && !topOn) {
+          const hlVal = getComputedStyle(document.documentElement).getPropertyValue("--g6-startcell-highlight").trim();
+          const hlParts = hlVal.split(",");
+          const hlOn = hlParts[0].trim() === "1";
+          const hlColor = hlParts[1] ? hlParts[1].trim() : "var(--g6-selected-color)";
+          if (hlOn) {
+            if(h) { h.style.color = hlColor; h.style.fontWeight = "var(--g6-selected-weight)"; }
+            if(k) { k.style.color = hlColor; k.style.fontWeight = "var(--g6-selected-weight)"; }
+          }
         }
       }
+      curr = (curr + 1) % 60;
     }
-    curr = (curr + 1) % 60;
-  }
+  });
 
-  // 선택된 G6 셀 스타일 복원 (배경색 + 폰트)
+  // 선택된 G6 셀 스타일 복원
   if (selectedCell) {
     const h = selectedCell.querySelector(".hanjaBox");
     const k = selectedCell.querySelector(".korBox");
@@ -2574,9 +2875,79 @@ function applyG6RangeConditionalFormatting() {
 
 // [G6bg] 5. 숫자 카운트(1~120) 업데이트 함수
 function updateG6bgIndicators() {
-  const startYear = parseInt(G3C6.textContent.trim());
-  const endYear = parseInt(G3C7.textContent.trim());
+  const isPaired = G3C7.classList.contains("g3-paired");
   const topOn = window.g6TopBoxEnabled !== false;
+
+  if (isPaired) {
+    // ── 쌍 왕 모드: 1치세 → 1.1, 1.2... / 2치세 → 2.1, 2.2...
+    const s1 = parseInt(G3C9.dataset.pairedStart1);
+    const e1 = parseInt(G3C9.dataset.pairedEnd1);
+    const s2 = parseInt(G3C9.dataset.pairedStart2);
+    const e2 = parseInt(G3C9.dataset.pairedEnd2);
+    if (isNaN(s1) || isNaN(e1) || isNaN(s2) || isNaN(e2)) return;
+
+    const idx1 = getG6bgGanjiIndex(s1);
+    const dur1 = e1 - s1;
+    const idx2 = getG6bgGanjiIndex(s2);
+    const dur2 = e2 - s2;
+
+    if (topOn) {
+      cells.forEach((cell, i) => {
+        const topBox = cell.querySelector(".topBox");
+        if (!topBox) return;
+        const pos1 = (i - idx1 + 60) % 60;
+        const pos2 = (i - idx2 + 60) % 60;
+        const in1 = pos1 <= dur1;
+        const in2 = pos2 <= dur2;
+        if (in1 && in2) {
+          topBox.innerHTML = `<span class='topBox-badge' style='display:inline;font-size:13px;color:#000;line-height:1.2;white-space:nowrap;'>1.${pos1+1}<br>2.${pos2+1}</span>`;
+        } else if (in1) {
+          topBox.innerHTML = `<span class='topBox-badge' style='display:inline;font-size:13px;color:#000;'>1.${pos1+1}</span>`;
+        } else if (in2) {
+          topBox.innerHTML = `<span class='topBox-badge' style='display:inline;font-size:13px;color:#000;'>2.${pos2+1}</span>`;
+        } else {
+          // 범위 밖 — 빈칸 (index 숨김)
+          topBox.innerHTML = ``;
+        }
+      });
+      document.querySelectorAll(".hanja-num, .kor-num").forEach(el => {
+        el.textContent = "";
+        el.style.backgroundColor = "var(--color-bg-transparent)";
+      });
+    } else {
+      const allHanjaNums = document.querySelectorAll(".hanja-num");
+      const allKorNums   = document.querySelectorAll(".kor-num");
+      allHanjaNums.forEach(el => { el.textContent = ""; el.style.backgroundColor = "var(--color-bg-transparent)"; });
+      allKorNums.forEach(el => { el.textContent = ""; el.style.backgroundColor = "var(--color-bg-transparent)"; });
+
+      for (let i = 0; i < 60; i++) {
+        const pos1 = (i - idx1 + 60) % 60;
+        const pos2 = (i - idx2 + 60) % 60;
+        const in1 = pos1 <= dur1;
+        const in2 = pos2 <= dur2;
+        const hn = allHanjaNums[i];
+        const kn = allKorNums[i];
+        if (!hn) continue;
+        if (in1 && in2) {
+          hn.textContent = `1.${pos1+1}`;
+          hn.style.backgroundColor = "var(--color-bg-badge)";
+          if (kn) { kn.textContent = `2.${pos2+1}`; kn.style.backgroundColor = "var(--color-bg-badge)"; }
+        } else if (in1) {
+          hn.textContent = `1.${pos1+1}`;
+          hn.style.backgroundColor = "var(--color-bg-badge)";
+        } else if (in2) {
+          hn.textContent = `2.${pos2+1}`;
+          hn.style.backgroundColor = "var(--color-bg-badge)";
+        }
+      }
+    }
+    return;
+  }
+
+  // ── 일반 왕 모드 (기존 로직 유지) ──
+  const startYear = parseInt(G3C7.textContent.trim());
+  const endYear = parseInt(G3C8.textContent.trim());
+  // topOn은 함수 상단에서 이미 선언됨
 
   // topBox ON일 때: index/badge 전환 방식
   if (topOn) {
@@ -2680,7 +3051,7 @@ function updateG6bgIndicators() {
   }
 }
 
-// [G6bg] 6. 통합 옵저버 설정 (G3C6, G3C7 변경 시 자동 실행)
+// [G6bg] 6. 통합 옵저버 설정 (G3C7, G3C8 변경 시 자동 실행)
 const g6bgMasterObserver = new MutationObserver(() => {
   applyG6RangeConditionalFormatting();
   updateG6BadgePosition(); /* 위치 먼저 */
@@ -2689,8 +3060,8 @@ const g6bgMasterObserver = new MutationObserver(() => {
 
 // 실행 및 감시 시작
 createG6bgIndicators();
-g6bgMasterObserver.observe(G3C6, { childList: true, subtree: true });
 g6bgMasterObserver.observe(G3C7, { childList: true, subtree: true });
+g6bgMasterObserver.observe(G3C8, { childList: true, subtree: true });
 
 // 초기 화면 로드 시 즉시 실행
 applyG6RangeConditionalFormatting();
@@ -2896,8 +3267,8 @@ G1C6.addEventListener("click", function() {
   }
 
   // 왕조가 이미 선택되어 있으면 즉시 갱신
-  const startVal = G3C6.textContent.trim();
-  const endVal   = G3C7.textContent.trim();
+  const startVal = G3C7.textContent.trim();
+  const endVal   = G3C8.textContent.trim();
   if (startVal && endVal && !isNaN(parseInt(startVal)) && !isNaN(parseInt(endVal))) {
     applyG6RangeConditionalFormatting();
   }
@@ -3164,8 +3535,8 @@ G7OddCellIds.forEach(id => {
   });
 });
 
-// ===== G7R1C9, G7R2C9 — G6 스타일 호버 + 클립 복사 =====
-["G7R1C9", "G7R2C9"].forEach(id => {
+// ===== G7R1C9 — G6 스타일 호버 + 클립 복사 =====
+["G7R1C9"].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
 
@@ -3312,7 +3683,9 @@ function updateG7R3(r1Id, r2Id, r3Id) {
   const r3El = document.getElementById(r3Id);
   if (!r3El) return;
   if (!isNaN(v1) && !isNaN(v2)) {
-    r3El.textContent = Math.abs(v1 - v2) + 1;
+    // 향년·수 모드: +1 / 만 모드: +0
+    const offset = g7C8HyanMode ? 1 : 0;
+    r3El.textContent = Math.abs(v1 - v2) + offset;
   } else {
     r3El.textContent = "";
   }
@@ -3345,27 +3718,27 @@ G7R3CalcPairs.forEach(({ r1Id, r2Id, r3Id }) => {
   if (r2El2) r2El2.addEventListener("input", () => updateG7R3(r1Id, r2Id, r3Id));
 });
 
+// ===== G7R2C7 향년/령 토글 =====
+// true = 향년·수 (+1 적용), false = 만 (+0, 변동 없음)
+let g7C8HyanMode = true; // 기본: 향년·수
+
 // 초기 계산
 updateAllG7R3();
-
-// ===== G7R2C7 향년/령 토글 =====
-// true = 향년 (-1 적용), false = 령 (0, -1 없음)
-let g7C8HyanMode = true; // 기본: 향년
 
 function updateG7R2C7Label() {
   const labelEl = document.getElementById("G7R2C7");
   const supEl   = document.getElementById("G7R2C7sup");
   if (!labelEl || !supEl) return;
   if (g7C8HyanMode) {
-    labelEl.childNodes[0].textContent = "향년";
-    supEl.textContent = "-1";
-    supEl.style.display = "inline";
+    labelEl.childNodes[0].textContent = "향년·수";
+    supEl.style.display = "none";
   } else {
-    labelEl.childNodes[0].textContent = "령";
+    labelEl.childNodes[0].textContent = "만나이";
     supEl.style.display = "none";
   }
   // 값이 있으면 재계산
   recalcC8(lastEditedC8[0] || "R2");
+  updateAllG7R3(); // 생졸 기준 셀(C2/C4/C6)도 모드 변경에 맞춰 재계산
 }
 
 // G7R2C7 클릭 → 향년 ↔ 령 토글
@@ -3508,25 +3881,31 @@ attachC8Events("R1");        // 생년 (제한 없음)
 attachC8Events("R2", 150);  // 향년 (최대 150)
 attachC8Events("R3");        // 졸년 (제한 없음)
 
-// ===== G7 C9/C10 단기↔서기 변환 =====
-// G7R1C9/C10: C10=서기 입력 → C9=단기(서기+2333) 표시
-// G7R2C9/C10: C10=단기 입력 → C9=서기(단기-2333) 표시
-const G7ConvPairs = [
-  { inputId:"G7R1C10", displayId:"G7R1C9", convert: v => v + 2333, label:"단기" },
-  { inputId:"G7R2C10", displayId:"G7R2C9", convert: v => v - 2333, label:"서기" },
-];
+// ===== G7 C9/C10 단기↔서기 자동 변환 =====
+// G7R1C10: 단기(≥2334) 또는 서기(<2334) 입력 → G7R1C9에 반대 결과 표시
+// G7R2C9, G7R2C10: 사용하지 않음 (빈 셀)
 
-function updateG7Conv(inputId, convert, displayId) {
-  const inputEl   = document.getElementById(inputId);
-  const displayEl = document.getElementById(displayId);
+function updateG7Conv10() {
+  const inputEl   = document.getElementById("G7R1C10");
+  const displayEl = document.getElementById("G7R1C9");
   if (!inputEl || !displayEl) return;
   const val = parseInt(inputEl.textContent.trim());
-  displayEl.textContent = !isNaN(val) ? convert(val) : "";
+  if (isNaN(val)) {
+    displayEl.textContent = "";
+    return;
+  }
+  if (val >= 2334) {
+    // 단기 입력 → 서기 표시
+    displayEl.textContent = val - 2333;
+  } else {
+    // 서기 입력 → 단기 표시
+    displayEl.textContent = val + 2333;
+  }
 }
 
-G7ConvPairs.forEach(({ inputId, displayId, convert, label }) => {
-  const inputEl   = document.getElementById(inputId);
-  const displayEl = document.getElementById(displayId);
+(function() {
+  const inputEl   = document.getElementById("G7R1C10");
+  const displayEl = document.getElementById("G7R1C9");
   if (!inputEl || !displayEl) return;
 
   // 포커스 시 전체 선택
@@ -3539,15 +3918,13 @@ G7ConvPairs.forEach(({ inputId, displayId, convert, label }) => {
   });
 
   // 실시간 변환
-  inputEl.addEventListener("input", function() {
-    updateG7Conv(inputId, convert, displayId);
-  });
+  inputEl.addEventListener("input", updateG7Conv10);
 
-  // 엔터 → 다음 셀 이동
+  // 엔터/탭 → 다음 셀 이동
   inputEl.addEventListener("keydown", function(e) {
     if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
-      const idx = allG7YearIds.indexOf(inputId);
+      const idx = allG7YearIds.indexOf("G7R1C10");
       const nextIdx = e.shiftKey
         ? (idx - 1 + allG7YearIds.length) % allG7YearIds.length
         : (idx + 1) % allG7YearIds.length;
@@ -3569,7 +3946,7 @@ G7ConvPairs.forEach(({ inputId, displayId, convert, label }) => {
       displayEl.textContent = "";
     }
   });
-});
+})();
 
 // 초기값 설정
 // 초기값 설정 (생년 + 향년 → 졸년 자동계산)
@@ -3577,17 +3954,15 @@ document.getElementById("G7R1C8").textContent = 1625;
 document.getElementById("G7R2C8").textContent = 45;
 lastEditedC8 = ["R1","R2"];
 recalcC8("R2");
-document.getElementById("G7R1C10").textContent = 1840;
-document.getElementById("G7R2C10").textContent = 4190;
-updateG7Conv("G7R1C10", v => v + 2333, "G7R1C9");
-updateG7Conv("G7R2C10", v => v - 2333, "G7R2C9");
+document.getElementById("G7R1C10").textContent = 4233;
+updateG7Conv10();
 
-// G3C3 버전 표시 (--version CSS 변수에서 읽어옴)
+// G3C4 버전 표시 (--version CSS 변수에서 읽어옴)
 (function() {
   const style = getComputedStyle(document.documentElement);
   const ver = style.getPropertyValue("--version").trim().replace(/['"]/g, "");
   const opacity = style.getPropertyValue("--version-opacity").trim() || "0.3";
-  const el = document.getElementById("G3C3");
+  const el = document.getElementById("G3C4");
   if (el) { el.textContent = ver; el.style.opacity = opacity; }
 })();
 
@@ -3724,7 +4099,7 @@ const allG7YearIds = [
   "G7R1C4","G7R2C4",
   "G7R1C6","G7R2C6",
   "G7R1C8","G7R2C8","G7R3C8",
-  "G7R1C10","G7R2C10",
+  "G7R1C10",
 ];
 allG7Pairs.forEach(([ganjiId, yearId]) => {
   const yearEl  = document.getElementById(yearId);
