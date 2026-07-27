@@ -12,13 +12,13 @@
 </script>
 <!-- 
   제작자: Sukju Lee
-  제작일: 2026-04-06
+  최초 제작일: 2026-03-30
   설명: 육십갑자 구조 - 중국/한국 왕조 연도 조회
   라이선스: 상업적, 개인적 용도로 자유롭게 사용 가능합니다. 단, 판매는 금지합니다.
 -->
 <title>육십갑자</title>
 <style>
-/* D2Coding 웹폰트 — jsdelivr CDN (Joungkyun/font-d2coding v1.3.2) */
+/* D2Coding 웹폰트 — jsdelivr CDN (Joungkyun/font-d2coding v1.0.3.3) */
 @font-face {
   font-family: 'D2Coding';
   font-style: normal;
@@ -49,7 +49,7 @@
   /* ----------------------------------------
      버전
   ---------------------------------------- */
-  --version:              "v1.0.3"; /* 버전 넘버 */
+  --version:              "v1.0.3.2"; /* 버전 넘버 */
   --version-opacity:      0.3;      /* G3C4 버전 텍스트 투명도 (30%) */
   --g3c1-opacity:         0.3;      /* G3C1 인덱스 숫자 투명도 (30%) */
 
@@ -210,6 +210,14 @@
   --g6-cell-color:        #000000;  /* G6 hanjaBox/korBox 기본 텍스트색 */
   --g6-hanjaline-color:   #DBDCDE;  /* G6 hanjaBox 하단 구분선 색상 */
   --g6-hanjaline-width:   1px;      /* G6 hanjaBox 하단 구분선 두께 */
+  /* ★ G6 박스 클래스명 — 변경 시 이 변수와 JS의 G6_HANJA_CLASS / G6_KOR_CLASS 도 함께 수정 */
+  --g6-hanja-class:       hanjaBox; /* G6 한자 영역 클래스명 */
+  --g6-kor-class:         korBox;   /* G6 한글 영역 클래스명 */
+  /* ★ G6 마지막 클릭 영역 — JS에서 setProperty로 갱신됨
+     값: "hanja" = 한자 영역, "kor" = 한글 영역, "top" = topBox 영역, "" = 미선택
+     JS 참조: window.g6LastClickArea
+     CSS 참조: var(--g6-last-click-area) */
+  --g6-last-click-area:   "";       /* G6 마지막 클릭 영역 ("hanja" | "kor" | "top" | "") */
 
   /* ----------------------------------------
      G6bg : 치세L2 배지 위치 조정 변수 (상단OFF 전용)
@@ -1147,7 +1155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateG4Cells(){ if(selectedCellIndex === null) return; let firstVal = parseInt(G4Boxes[0].dataset.year); if(isNaN(firstVal)) return; for(let i=1; i<G4Boxes.length; i++){ let val = firstVal + i*60; if(firstVal < 0 && firstVal + i*60 >= 0) val += 1; G4Boxes[i].dataset.year = val; G4Boxes[i].textContent = Math.abs(val); G4Boxes[i].style.color = val < 0 ? "var(--color-text-red)" : "var(--color-text-default)"; } }
   const G5Suffix = ["74","65","56","47","38","29","10","01","92","83"];
-  window.g5Mode = 0; // 0:OFF, 1:단기1, 2:단기2
+  window.g5Mode = 0; // 0:OFF, 1:단기0(셀별 suffix), 2:단기1, 3:단기2
   window.updateG5Cells = function updateG5Cells(){
     const suffixIdx = selectedCellIndex !== null ? selectedCellIndex % 10 : 0;
     const s = G5Suffix[suffixIdx]; /* 선택된 셀의 index % 10 값으로 고정 */
@@ -1158,11 +1166,11 @@ document.addEventListener("DOMContentLoaded", () => {
       box.style.whiteSpace = "nowrap";
       box.style.overflow = "hidden";
       if(!isNaN(absVal)){
-        if (window.g5Mode === 2) {
+        if (window.g5Mode === 3) {
           /* 단기2: [빨강앞자리뒷자리] */
           box.style.fontSize = "11px";
           box.innerHTML = (absVal+2333) + `[<span style="color:var(--color-text-red)">${s[0]}</span>${s[1]}]`;
-        } else if (window.g5Mode === 1) {
+        } else if (window.g5Mode === 2) {
           /* 단기1: BC이면 앞자리(빨강)만, AD이면 뒷자리만 */
           box.style.fontSize = "11px";
           const isBC = val < 0;
@@ -1170,6 +1178,17 @@ document.addEventListener("DOMContentLoaded", () => {
             box.innerHTML = (absVal+2333) + `[<span style="color:var(--color-text-red)">${s[0]}</span>]`;
           } else {
             box.innerHTML = (absVal+2333) + `[${s[1]}]`;
+          }
+        } else if (window.g5Mode === 1) {
+          /* 단기0: 셀마다 개별 suffix(idx 기준) 적용
+             BC이면 앞자리(빨강)만, AD이면 뒷자리만 */
+          box.style.fontSize = "11px";
+          const s0 = G5Suffix[idx % 10];
+          const isBC = val < 0;
+          if (isBC) {
+            box.innerHTML = (absVal+2333) + `[<span style="color:var(--color-text-red)">${s0[0]}</span>]`;
+          } else {
+            box.innerHTML = (absVal+2333) + `[${s0[1]}]`;
           }
         } else {
           /* OFF */
@@ -1226,14 +1245,14 @@ function getG4BlackCellsText() {
 
     // 2. G6 선택된 셀의 한자 영역 텍스트
     const g6HanjaText = selectedCell
-      ? (selectedCell.querySelector(".hanjaBox")?.textContent.trim() || "")
+      ? (selectedCell.querySelector("." + G6_HANJA_CLASS)?.textContent.trim() || "")
       : "";
 
     // 3. 조합: G3C5 + G6한자 + G4검정셀 (각 사이 빈칸 하나)
     const parts = [g3c5Text, g6HanjaText, g4Values].filter(v => v);
     const copyText = parts.join(" ");
 
-    navigator.clipboard.writeText(copyText)
+    copyToClipboard(copyText)
       .then(() => {
         console.log(`G3C5 Ctrl복사: ${copyText}`);
         const orig = g3c5.style.backgroundColor;
@@ -1244,7 +1263,7 @@ function getG4BlackCellsText() {
 
     } else {
       // ── 일반 클릭: G3C5 내용 복사
-      navigator.clipboard.writeText(g3c5Text)
+      copyToClipboard(g3c5Text)
         .then(() => {
           console.log(`G3C5 복사: ${g3c5Text}`);
           const orig = g3c5.style.backgroundColor;
@@ -1267,7 +1286,7 @@ copyTargets.forEach((cell) => {
     const text = cell.textContent.trim();
     if (!text || text === "왕조 표시") return;
 
-    navigator.clipboard.writeText(text)
+    copyToClipboard(text)
       .then(() => {
         console.log(`G3 복사 완료: ${text}`);
         const originalBg = cell.style.backgroundColor;
@@ -1282,6 +1301,11 @@ copyTargets.forEach((cell) => {
 
 
 // ===== G4 cell click 클립보드 복사 =====
+// - 일반 클릭/터치: G4 셀 값만 복사
+// - Ctrl + 클릭: G4 셀 값 + G6 선택 셀 텍스트 (g6LastClickArea 기준) 복사
+//   G6 한자 영역 클릭 후 → 예) "己巳 1689"
+//   G6 한글 영역 클릭 후 → 예) "기사 1689"
+//   G6 선택 셀 없으면 → G4 값만 복사
 const G4Cells = document.querySelectorAll(".G4 .box");
 
 G4Cells.forEach((cell, index) => {
@@ -1290,22 +1314,107 @@ G4Cells.forEach((cell, index) => {
   cell.addEventListener("mouseenter", function(){ cell.style.boxShadow="inset 0 0 0 2px var(--color-border-red)"; cell.style.zIndex="1"; });
   cell.addEventListener("mouseleave", function(){ cell.style.boxShadow="none"; cell.style.zIndex=""; });
 
-  // 클릭 이벤트
-  cell.addEventListener("click", () => {
+  let _g4TouchHandled = false;
+
+  function handleG4Copy(isCtrl) {
     const text = cell.textContent.trim();
+    if (isCtrl && selectedCell) {
+      // ── Ctrl+클릭: G4값 + G6 선택 셀 텍스트 (클릭 영역 기준) ──
+      const hanjaEl   = selectedCell.querySelector("." + G6_HANJA_CLASS);
+      const korEl     = selectedCell.querySelector("." + G6_KOR_CLASS);
+      const hanjaText = hanjaEl ? hanjaEl.textContent.trim() : "";
+      const korText   = korEl   ? korEl.textContent.trim()   : "";
+      const area      = window.g6LastClickArea || "hanja"; /* 미선택이면 한자 기본 */
+      const g6Text    = (area === "hanja") ? hanjaText : (area === "kor" ? korText : hanjaText);
+      const copyText  = g6Text ? `${g6Text} ${text}` : text;
+      copyToClipboard(copyText)
+        .then(() => {
+          console.log(`G4 Ctrl복사: ${copyText}`);
+          const orig = cell.style.backgroundColor;
+          cell.style.backgroundColor = "var(--color-bg-yellow-dark)";
+          setTimeout(() => { cell.style.backgroundColor = orig; }, 150);
+        })
+        .catch(err => console.error("클립보드 복사 실패:", err));
+    } else {
+      // ── 일반 클릭: G4 값만 복사 ──
+      copyToClipboard(text)
+        .then(() => console.log(`G4 셀 ${index + 1} 복사: ${text}`))
+        .catch(err => console.error("클립보드 복사 실패:", err));
+    }
+  }
 
-    // 클립보드 복사
-    navigator.clipboard.writeText(text)
-      .then(() => console.log(`G4 셀 ${index + 1} 데이터 복사 완료: ${text}`))
-      .catch(err => console.error("클립보드 복사 실패:", err));
+  // 터치 (모바일)
+  cell.addEventListener("touchend", function(e) {
+    e.preventDefault();
+    _g4TouchHandled = true;
+    handleG4Copy(false);
+    setTimeout(() => { _g4TouchHandled = false; }, 500);
+  }, { passive: false });
 
-    // 눌리는 효과 (transform만)
-    // cell.style.transform = "scale(0.95)";
-    // setTimeout(() => cell.style.transform = "scale(1)", 100);
+  // 클릭 (PC)
+  cell.addEventListener("click", (e) => {
+    if (_g4TouchHandled) return;
+    handleG4Copy(e.ctrlKey);
   });
 
 });
 
+
+// ===== G6 박스 클래스명 상수 =====
+// CSS --g6-hanja-class / --g6-kor-class 와 대응. 변경 시 두 곳 모두 수정.
+const G6_HANJA_CLASS = "hanjaBox"; /* G6 한자 영역 클래스명 */
+const G6_KOR_CLASS   = "korBox";   /* G6 한글 영역 클래스명 */
+
+// ===== G6 마지막 클릭 영역 추적 =====
+// "hanja" | "kor" | "top" | "" (미선택)
+// CSS --g6-last-click-area 와 항상 동기화됨
+window.g6LastClickArea = "";
+
+// ===== 클립보드 복사 유틸 (모바일 포함) =====
+// 동기 execCommand 를 1순위로 → 실패 시 Async Clipboard API 재시도
+// iOS: textarea를 뷰포트 안에 두고 font-size:16px(zoom방지), readOnly 해제
+// Android WebView: navigator.clipboard undefined → execCommand 폴백
+function copyToClipboard(text) {
+  const syncOk = _clipboardSync(text);
+  if (syncOk) return Promise.resolve(true);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text)
+      .then(() => true)
+      .catch(err => { console.warn("Clipboard API 실패:", err); return false; });
+  }
+  return Promise.resolve(false);
+}
+function _clipboardSync(text) {
+  let ta;
+  try {
+    ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = [
+      "position:fixed","top:0","left:0","width:2em","height:2em",
+      "padding:0","border:none","outline:none","box-shadow:none",
+      "background:transparent","font-size:16px","opacity:0","z-index:-1",
+    ].join(";");
+    ta.readOnly = false;
+    ta.contentEditable = "true";
+    document.body.appendChild(ta);
+    const isIOS = /ipad|iphone|ipod/i.test(navigator.userAgent);
+    if (isIOS) {
+      const range = document.createRange();
+      range.selectNodeContents(ta);
+      const sel = window.getSelection();
+      if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+    }
+    ta.focus();
+    ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) {
+    console.warn("_clipboardSync 실패:", e);
+    if (ta && ta.parentNode) document.body.removeChild(ta);
+    return false;
+  }
+}
 
 // ===== G6 복사 설정 상태 =====
 // bracketOrder: [] 선택 순서 기록, 예) ["()"] or ["[]"] or ["()","[]"] or ["[]","()"]
@@ -1592,24 +1701,24 @@ function getG6CopyText(hanjaText, korText, isOnHanja, isCtrl, isAlt) {
       if (r2label) r2label.textContent = "클릭한 ";
       if (r1text)  r1text.textContent  = h;
       if (r2text)  r2text.textContent  = k;
-      if (row1) row1.onclick = () => { navigator.clipboard.writeText(h); menu.style.display = "none"; };
-      if (row2) row2.onclick = () => { navigator.clipboard.writeText(k); menu.style.display = "none"; };
+      if (row1) row1.onclick = () => { copyToClipboard(h); menu.style.display = "none"; };
+      if (row2) row2.onclick = () => { copyToClipboard(k); menu.style.display = "none"; };
     } else if (hanOn && !korOn) {
       // 漢만 ON — 둘 다 한자
       if (r1label) r1label.textContent = "클릭漢 ";
       if (r2label) r2label.textContent = "클릭한 ";
       if (r1text)  r1text.textContent  = h;
       if (r2text)  r2text.textContent  = h;
-      if (row1) row1.onclick = () => { navigator.clipboard.writeText(h); menu.style.display = "none"; };
-      if (row2) row2.onclick = () => { navigator.clipboard.writeText(h); menu.style.display = "none"; };
+      if (row1) row1.onclick = () => { copyToClipboard(h); menu.style.display = "none"; };
+      if (row2) row2.onclick = () => { copyToClipboard(h); menu.style.display = "none"; };
     } else {
       // 한만 ON — 둘 다 한글
       if (r1label) r1label.textContent = "클릭漢 ";
       if (r2label) r2label.textContent = "클릭한 ";
       if (r1text)  r1text.textContent  = k;
       if (r2text)  r2text.textContent  = k;
-      if (row1) row1.onclick = () => { navigator.clipboard.writeText(k); menu.style.display = "none"; };
-      if (row2) row2.onclick = () => { navigator.clipboard.writeText(k); menu.style.display = "none"; };
+      if (row1) row1.onclick = () => { copyToClipboard(k); menu.style.display = "none"; };
+      if (row2) row2.onclick = () => { copyToClipboard(k); menu.style.display = "none"; };
     }
   }
 
@@ -1655,8 +1764,8 @@ function getG6CopyText(hanjaText, korText, isOnHanja, isCtrl, isAlt) {
     const r4text = document.getElementById("menuRow4Text");
     if (r3text) r3text.textContent = p3;
     if (r4text) r4text.textContent = p4;
-    if (row3) row3.onclick = () => { navigator.clipboard.writeText(p3); menu.style.display = "none"; };
-    if (row4) row4.onclick = () => { navigator.clipboard.writeText(p4); menu.style.display = "none"; };
+    if (row3) row3.onclick = () => { copyToClipboard(p3); menu.style.display = "none"; };
+    if (row4) row4.onclick = () => { copyToClipboard(p4); menu.style.display = "none"; };
   }
 
   // 복사 항목들
@@ -1844,99 +1953,101 @@ function getG6CopyText(hanjaText, korText, isOnHanja, isCtrl, isAlt) {
 
 // ===== G6 60갑자 셀 클릭, 클립보드 복사 및 호버 처리 =====
 cells.forEach((cell, index) => {
-  const hanja = cell.querySelector(".hanjaBox"); // 한자 영역
-  const kor = cell.querySelector(".korBox");     // 한글 영역
+  const hanja = cell.querySelector("." + G6_HANJA_CLASS); // 한자 영역
+  const kor   = cell.querySelector("." + G6_KOR_CLASS);   // 한글 영역
 
-  // ===== G6 셀 클릭 이벤트 =====
-  cell.addEventListener("click", function(event) {
+  // 모바일 touchend → click 중복 방지 플래그
+  let _touchHandled = false;
+
+  // ===== 공통 처리 함수 (click / touchend 양쪽 호출) =====
+  function handleG6Action(clientY, isCtrl, isAlt) {
 
     // ----- 클립보드 복사 준비: 영역 판정 (DOM 업데이트 전에 측정) -----
     const hanjaText = hanja.textContent.trim();
     const korText   = kor.textContent.trim();
     const hanjaRect = hanja.getBoundingClientRect();
     const korRect   = kor.getBoundingClientRect();
-    const isOnHanja = event.clientY >= hanjaRect.top && event.clientY < hanjaRect.bottom;
-    const isOnKor   = event.clientY >= korRect.top   && event.clientY < korRect.bottom;
+    const isOnHanja = clientY >= hanjaRect.top && clientY < hanjaRect.bottom;
+    const isOnKor   = clientY >= korRect.top   && clientY < korRect.bottom;
     const isOnTop   = !isOnHanja && !isOnKor;
+
+    // ----- 클릭 영역 전역 변수 갱신 -----
+    window.g6LastClickArea = isOnHanja ? "hanja" : (isOnKor ? "kor" : "top");
+    /* CSS :root 변수도 동기화 */
+    document.documentElement.style.setProperty("--g6-last-click-area", window.g6LastClickArea);
 
     // G6 복사 텍스트 미리 계산 (클립 ON + 한자/한글 영역 클릭 시)
     let g6CopyText = null;
     if (!isOnTop && window.g6ClipEnabled) {
-      g6CopyText = getG6CopyText(hanjaText, korText, isOnHanja, event.ctrlKey, event.altKey);
+      g6CopyText = getG6CopyText(hanjaText, korText, isOnHanja, isCtrl, isAlt);
     }
 
     // ----- 기존 G6 클릭 처리 유지 -----
 
     // 1. 모든 셀 초기화: 글자색, 글자 굵기, 배경색
-    cells.forEach(c => { 
-      const ch = c.querySelector(".hanjaBox");
-      const ck = c.querySelector(".korBox");
+    cells.forEach(c => {
+      const ch = c.querySelector("." + G6_HANJA_CLASS);
+      const ck = c.querySelector("." + G6_KOR_CLASS);
       if(ch) { ch.style.color = "var(--color-text-default)"; ch.style.fontWeight = "normal"; ch.style.backgroundColor = ""; }
       if(ck) { ck.style.color = "var(--color-text-default)"; ck.style.fontWeight = "normal"; ck.style.backgroundColor = ""; }
     });
 
     // 2. 선택된 인덱스 및 셀 저장, G4/G5/G3 관련 업데이트
     selectedCellIndex = index;
-    selectedCell = cell; // 선택된 셀 직접 저장
+    selectedCell = cell;
     updateG4C1();
     updateG4Cells();
     updateG5Cells();
     updateG3C1();
     updateG3YearColor();
 
-    // 3. 왕조 범위 배경색 적용 (쌍 왕/일반 왕 공통 — applyG6RangeConditionalFormatting 재사용)
+    // 3. 왕조 범위 배경색 적용
     if (typeof applyG6RangeConditionalFormatting === "function") {
       applyG6RangeConditionalFormatting();
     }
 
-    // 4. 클릭한 셀 강조 (폰트 효과, topBox ON이면 한자/한글 영역 밝은 노랑 배경)
-    const topOn = window.g6TopBoxEnabled !== false;
+    // 4. 클릭한 셀 강조
     hanja.style.backgroundColor = "#FFFF00";
     kor.style.backgroundColor   = "#FFFF00";
     hanja.style.color = "var(--g6-selected-color)";
-    kor.style.color = "var(--g6-selected-color)";
+    kor.style.color   = "var(--g6-selected-color)";
     hanja.style.fontWeight = "var(--g6-selected-weight)";
-    kor.style.fontWeight = "var(--g6-selected-weight)";
+    kor.style.fontWeight   = "var(--g6-selected-weight)";
 
     // 5. G6bg 숫자 레이어 다시 그리기
     if (typeof updateG6bgIndicators === "function") {
       updateG6bgIndicators();
     }
 
-    // 6. 클립보드 복사 — g4CopyMode 에 따라 분기 (DOM 확정 후)
+    // 6. 클립보드 복사 — g4CopyMode 에 따라 분기
     if (window.g6ClipEnabled) {
       const g4BlackText = getG4BlackCellsText();
       const mode = window.g4CopyMode || "none";
 
       if (mode === "none") {
-        // G4없음: G6 텍스트만 복사
         if (g6CopyText !== null) {
-          navigator.clipboard.writeText(g6CopyText)
+          copyToClipboard(g6CopyText)
             .then(() => console.log(`G6 복사: ${g6CopyText}`))
             .catch(err => console.error("클립보드 복사 실패:", err));
         }
-
       } else if (mode === "merge") {
-        // G6+G4 한 줄: 공백으로 합쳐 1회 복사
         const parts = [g6CopyText, g4BlackText].filter(v => v);
         if (parts.length > 0) {
           const finalText = parts.join(" ");
-          navigator.clipboard.writeText(finalText)
+          copyToClipboard(finalText)
             .then(() => console.log(`G6+G4 합산복사: ${finalText}`))
             .catch(err => console.error("클립보드 복사 실패:", err));
         }
-
       } else if (mode === "split") {
-        // 분리: G6 먼저 → delay ms 후 G4
         const delay = (typeof window.g4SplitDelay === "number" && window.g4SplitDelay >= 10)
           ? window.g4SplitDelay : 150;
         if (g6CopyText !== null) {
-          navigator.clipboard.writeText(g6CopyText)
+          copyToClipboard(g6CopyText)
             .then(() => {
               console.log(`G6 분리복사1: ${g6CopyText}`);
               if (g4BlackText) {
                 setTimeout(() => {
-                  navigator.clipboard.writeText(g4BlackText)
+                  copyToClipboard(g4BlackText)
                     .then(() => console.log(`G4 분리복사2: ${g4BlackText}`))
                     .catch(err => console.error("G4 분리복사 실패:", err));
                 }, delay);
@@ -1944,12 +2055,35 @@ cells.forEach((cell, index) => {
             })
             .catch(err => console.error("G6 분리복사 실패:", err));
         } else if (g4BlackText) {
-          // G6 텍스트 없을 때(topBox 클릭)는 G4만
-          navigator.clipboard.writeText(g4BlackText)
+          copyToClipboard(g4BlackText)
             .catch(err => console.error("클립보드 복사 실패:", err));
         }
       }
     }
+  } // handleG6Action 끝
+
+  // ===== touchend: 모바일 300ms 딜레이 없이 제스처 컨텍스트 안에서 즉시 처리 =====
+  cell.addEventListener("touchstart", function(e) {
+    const t = e.touches[0];
+    if (t) { cell._tsX = t.clientX; cell._tsY = t.clientY; }
+  }, { passive: true });
+
+  cell.addEventListener("touchend", function(e) {
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const moved = Math.abs(t.clientX - (cell._tsX || t.clientX)) > 10
+               || Math.abs(t.clientY - (cell._tsY || t.clientY)) > 10;
+    if (moved) return;
+    e.preventDefault();
+    _touchHandled = true;
+    handleG6Action(t.clientY, false, false);
+    setTimeout(() => { _touchHandled = false; }, 500);
+  }, { passive: false });
+
+  // ===== click: PC 마우스 + touchend 가 처리 못한 경우 =====
+  cell.addEventListener("click", function(event) {
+    if (_touchHandled) return;
+    handleG6Action(event.clientY, event.ctrlKey, event.altKey);
   });
 
   // ===== G6 셀 호버 효과 + 복사 미리보기 툴팁 =====
@@ -1984,10 +2118,10 @@ cells.forEach((cell, index) => {
 
   function showTooltip(e) {
     if (!window.g6TooltipEnabled) return;
-    const hanjaText = cell.querySelector(".hanjaBox").textContent.trim();
-    const korText   = cell.querySelector(".korBox").textContent.trim();
-    const hanjaRect = cell.querySelector(".hanjaBox").getBoundingClientRect();
-    const korRect2  = cell.querySelector(".korBox").getBoundingClientRect();
+    const hanjaText = cell.querySelector("." + G6_HANJA_CLASS).textContent.trim();
+    const korText   = cell.querySelector("." + G6_KOR_CLASS).textContent.trim();
+    const hanjaRect = cell.querySelector("." + G6_HANJA_CLASS).getBoundingClientRect();
+    const korRect2  = cell.querySelector("." + G6_KOR_CLASS).getBoundingClientRect();
     const isOnHanja = e.clientY >= hanjaRect.top && e.clientY < hanjaRect.bottom;
     const isOnKor   = e.clientY >= korRect2.top  && e.clientY < korRect2.bottom;
 
@@ -2042,8 +2176,8 @@ cells.forEach((cell, index) => {
   }
 
   cell.addEventListener("mouseenter", function(e){ 
-    const h = cell.querySelector(".hanjaBox");
-    const k = cell.querySelector(".korBox");
+    const h = cell.querySelector("." + G6_HANJA_CLASS);
+    const k = cell.querySelector("." + G6_KOR_CLASS);
     const isSelected = (cell === selectedCell);
     if(!isSelected) {
       if(h) { h.style.color="var(--color-text-red-copy)"; h.style.fontWeight="bold"; }
@@ -2053,8 +2187,8 @@ cells.forEach((cell, index) => {
   });
   cell.addEventListener("mousemove", showTooltip);
   cell.addEventListener("mouseleave", function(){ 
-    const h = cell.querySelector(".hanjaBox");
-    const k = cell.querySelector(".korBox");
+    const h = cell.querySelector("." + G6_HANJA_CLASS);
+    const k = cell.querySelector("." + G6_KOR_CLASS);
     const isSelected = (cell === selectedCell);
 
     if(!isSelected) {
@@ -2432,9 +2566,9 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
   {id:"대한01", era:"건양(建陽)", start:1896, end:1897},
   {id:"대한02", era:"광무(光武)", start:1897, end:1907},
   {id:"대한03", era:"융희(隆熙)", start:1907, end:1910},
-  {id:"대한04", era:"명치(明治)", start:1910, end:1912},
+  {id:"대한04", era:"명치(明治)", start:1868, end:1912},
   {id:"대한05", era:"대정(大正)", start:1912, end:1926},
-  {id:"대한06", era:"소화(昭和)", start:1926, end:1945}
+  {id:"대한06", era:"소화(昭和)", start:1926, end:1989}
   ];
 
   
@@ -2540,8 +2674,8 @@ document.addEventListener("mousemove", function(e) { window._lastMouseX = e.clie
   // G2 선택 시 G6 선택 셀 스타일 복원 함수
   function restoreSelectedCell() {
     if (!selectedCell) return;
-    const h = selectedCell.querySelector(".hanjaBox");
-    const k = selectedCell.querySelector(".korBox");
+    const h = selectedCell.querySelector("." + G6_HANJA_CLASS);
+    const k = selectedCell.querySelector("." + G6_KOR_CLASS);
     if(h) { h.style.color = "var(--g6-selected-color)"; h.style.fontWeight = "var(--g6-selected-weight)"; }
     if(k) { k.style.color = "var(--g6-selected-color)"; k.style.fontWeight = "var(--g6-selected-weight)"; }
   }
@@ -2816,8 +2950,8 @@ function applyG6RangeConditionalFormatting() {
   // G6 모든 셀 초기화
   cells.forEach(c => {
     c.style.backgroundColor = "var(--g6-bg)";
-    const h = c.querySelector(".hanjaBox");
-    const k = c.querySelector(".korBox");
+    const h = c.querySelector("." + G6_HANJA_CLASS);
+    const k = c.querySelector("." + G6_KOR_CLASS);
     const t = c.querySelector(".topBox");
     if(h) { h.style.backgroundColor = ""; h.style.color = "var(--color-text-default)"; h.style.fontWeight = "normal"; }
     if(k) { k.style.backgroundColor = ""; k.style.color = "var(--color-text-default)"; k.style.fontWeight = "normal"; }
@@ -2826,8 +2960,8 @@ function applyG6RangeConditionalFormatting() {
 
   // 선택된 셀 효과 즉시 복원
   if (selectedCell) {
-    const h = selectedCell.querySelector(".hanjaBox");
-    const k = selectedCell.querySelector(".korBox");
+    const h = selectedCell.querySelector("." + G6_HANJA_CLASS);
+    const k = selectedCell.querySelector("." + G6_KOR_CLASS);
     if(h) { h.style.backgroundColor = "#FFFF00"; h.style.color = "var(--g6-selected-color)"; h.style.fontWeight = "var(--g6-selected-weight)"; }
     if(k) { k.style.backgroundColor = "#FFFF00"; k.style.color = "var(--g6-selected-color)"; k.style.fontWeight = "var(--g6-selected-weight)"; }
   }
@@ -2841,8 +2975,8 @@ function applyG6RangeConditionalFormatting() {
     let curr = startIndex;
     for (let count = 0; count <= duration && count < 60; count++) {
       if (cells[curr]) {
-        const h = cells[curr].querySelector(".hanjaBox");
-        const k = cells[curr].querySelector(".korBox");
+        const h = cells[curr].querySelector("." + G6_HANJA_CLASS);
+        const k = cells[curr].querySelector("." + G6_KOR_CLASS);
         const t = cells[curr].querySelector(".topBox");
         if (topOn) {
           if(t) t.style.background = "linear-gradient(to bottom, transparent 0%, #FFD700 50%, transparent 100%)";
@@ -2867,8 +3001,8 @@ function applyG6RangeConditionalFormatting() {
 
   // 선택된 G6 셀 스타일 복원
   if (selectedCell) {
-    const h = selectedCell.querySelector(".hanjaBox");
-    const k = selectedCell.querySelector(".korBox");
+    const h = selectedCell.querySelector("." + G6_HANJA_CLASS);
+    const k = selectedCell.querySelector("." + G6_KOR_CLASS);
     if(h) { h.style.backgroundColor = "#FFFF00"; h.style.color = "var(--g6-selected-color)"; h.style.fontWeight = "var(--g6-selected-weight)"; }
     if(k) { k.style.backgroundColor = "#FFFF00"; k.style.color = "var(--g6-selected-color)"; k.style.fontWeight = "var(--g6-selected-weight)"; }
   }
@@ -3225,22 +3359,92 @@ G1C2.addEventListener("mousedown", function(e) {
   }
 });
 
-// ===== G1C5 단기 모드 순환 토글 (OFF → 단기1 → 단기2 → OFF) =====
+// ===== G1C5 단기 — 클릭: 순환 토글 / Ctrl+클릭: 서브메뉴 =====
+// 서브메뉴 항목: 단기(OFF), 단기0(셀별 suffix), 단기1, 단기2
 const G1C5 = document.getElementById("G1C5");
 
-G1C5.addEventListener("click", function() {
-  window.g5Mode = (window.g5Mode + 1) % 3; /* 0:OFF → 1:단기1 → 2:단기2 → 0:OFF */
-  if (window.g5Mode === 0) {
-    G1C5.textContent = "단기";   /* OFF */
+function applyG5Mode(mode) {
+  window.g5Mode = mode;
+  if (mode === 0) {
+    G1C5.textContent = "단기";
     G1C5.style.color = "var(--g1-color-inactive)";
-  } else if (window.g5Mode === 1) {
-    G1C5.textContent = "단기1";  /* ON - 단기1 */
+  } else if (mode === 1) {
+    G1C5.textContent = "단기0";
+    G1C5.style.color = "var(--g1-color)";
+  } else if (mode === 2) {
+    G1C5.textContent = "단기1";
     G1C5.style.color = "var(--g1-color)";
   } else {
-    G1C5.textContent = "단기2";  /* ON - 단기2 */
+    G1C5.textContent = "단기2";
     G1C5.style.color = "var(--g1-color)";
   }
   window.updateG5Cells();
+}
+
+function showDangiSubMenu() {
+  const existing = document.getElementById("dangi-sub-menu");
+  if (existing) { existing.remove(); return; }
+
+  const menu = document.createElement("div");
+  menu.id = "dangi-sub-menu";
+  menu.style.cssText = `
+    position: fixed;
+    background: rgba(0,0,0,0.9);
+    border-radius: 3px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    z-index: 99999;
+    font-family: 'D2Coding', monospace;
+    font-size: 11px;
+    padding: 4px 0;
+    color: #fff;
+  `;
+
+  const title = document.createElement("div");
+  title.textContent = "단기 모드";
+  title.style.cssText = "padding:3px 12px 4px; font-weight:bold; background:rgba(255,255,255,0.1); border-bottom:1px solid rgba(255,255,255,0.2); font-size:11px; text-align:center; color:#fff;";
+  menu.appendChild(title);
+
+  const items = [
+    { mode: 0, label: "단기  (OFF)" },
+    { mode: 1, label: "단기0  (셀별 suffix)" },
+    { mode: 2, label: "단기1" },
+    { mode: 3, label: "단기2" },
+  ];
+
+  items.forEach(({ mode, label }) => {
+    const item = document.createElement("div");
+    const isSelected = window.g5Mode === mode;
+    item.style.cssText = `padding:4px 16px; cursor:pointer; font-size:11px; color:#fff;${isSelected ? " background:rgba(255,255,255,0.15); font-weight:bold;" : ""}`;
+    item.textContent = label;
+    item.addEventListener("mouseenter", () => item.style.background = "rgba(255,255,255,0.2)");
+    item.addEventListener("mouseleave", () => item.style.background = isSelected ? "rgba(255,255,255,0.15)" : "transparent");
+    item.addEventListener("click", () => { applyG5Mode(mode); menu.remove(); });
+    menu.appendChild(item);
+  });
+
+  const rect = G1C5.getBoundingClientRect();
+  menu.style.left = rect.left + "px";
+  menu.style.top  = rect.bottom + "px";
+  document.body.appendChild(menu);
+
+  setTimeout(() => {
+    document.addEventListener("mousedown", function handler(ev) {
+      if (!menu.contains(ev.target)) {
+        menu.remove();
+        document.removeEventListener("mousedown", handler);
+      }
+    });
+  }, 0);
+}
+
+G1C5.addEventListener("mousedown", function(e) {
+  e.preventDefault();
+  if (e.ctrlKey) {
+    showDangiSubMenu();
+  } else {
+    // 일반 클릭 → 순환 토글 (OFF → 단기0 → 단기1 → 단기2 → OFF)
+    applyG5Mode((window.g5Mode + 1) % 4);
+  }
 });
 const G1C6 = document.getElementById("G1C6");
 window.g6TopBoxEnabled = true; // 초기값: ON
@@ -3281,8 +3485,8 @@ G1C6.addEventListener("click", function() {
 
   // 선택된 셀 폰트 효과 + 배경색 복원
   if (selectedCell) {
-    const h = selectedCell.querySelector(".hanjaBox");
-    const k = selectedCell.querySelector(".korBox");
+    const h = selectedCell.querySelector("." + G6_HANJA_CLASS);
+    const k = selectedCell.querySelector("." + G6_KOR_CLASS);
     if(h) { h.style.backgroundColor = "#FFFF00"; h.style.color = "var(--g6-selected-color)"; h.style.fontWeight = "var(--g6-selected-weight)"; }
     if(k) { k.style.backgroundColor = "#FFFF00"; k.style.color = "var(--g6-selected-color)"; k.style.fontWeight = "var(--g6-selected-weight)"; }
   }
@@ -3367,7 +3571,7 @@ function updateG6BadgePosition() {
 
   document.querySelectorAll(".kor-num").forEach(el => {
     const cellEl   = el.closest(".cell");
-    const hanjaEl  = cellEl ? cellEl.querySelector(".hanjaBox") : null;
+    const hanjaEl  = cellEl ? cellEl.querySelector("." + G6_HANJA_CLASS) : null;
     if (!cellEl || !hanjaEl) return;
     const cellRect  = cellEl.getBoundingClientRect();
     const hanjaRect = hanjaEl.getBoundingClientRect();
@@ -3403,7 +3607,7 @@ if (G1C4) {
       if (!el || !cellEl) return;
       const cellRect = cellEl.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
-      const lineY = cellEl.querySelector('.hanjaBox').getBoundingClientRect().bottom - cellRect.top;
+      const lineY = cellEl.querySelector('.' + G6_HANJA_CLASS).getBoundingClientRect().bottom - cellRect.top;
       showDebug(
         '<b>배지center(셀기준):</b> ' + ((elRect.top+elRect.bottom)/2 - cellRect.top).toFixed(2) +
         ' &nbsp;|&nbsp; <b>경계선:</b> ' + lineY.toFixed(2) +
@@ -3529,7 +3733,7 @@ G7OddCellIds.forEach(id => {
   el.addEventListener("click", function(e) {
     const fullEl = el.querySelector(".full");
     const text = (fullEl ? fullEl.textContent.trim() : null) || el.textContent.trim();
-    navigator.clipboard.writeText(text)
+    copyToClipboard(text)
       .then(() => console.log("G7 복사:", text))
       .catch(err => console.error("복사 실패:", err));
     e.preventDefault();
@@ -3555,7 +3759,7 @@ G7OddCellIds.forEach(id => {
   el.addEventListener("click", function(e) {
     const text = el.textContent.trim();
     if (!text) return;
-    navigator.clipboard.writeText(text)
+    copyToClipboard(text)
       .then(() => console.log(`${id} 복사:`, text))
       .catch(err => console.error("복사 실패:", err));
   });
@@ -3958,14 +4162,8 @@ recalcC8("R2");
 document.getElementById("G7R1C10").textContent = 4233;
 updateG7Conv10();
 
-// G3C4 버전 표시 (--version CSS 변수에서 읽어옴)
-(function() {
-  const style = getComputedStyle(document.documentElement);
-  const ver = style.getPropertyValue("--version").trim().replace(/['"]/g, "");
-  const opacity = style.getPropertyValue("--version-opacity").trim() || "0.3";
-  const el = document.getElementById("G3C4");
-  if (el) { el.textContent = ver; el.style.opacity = opacity; }
-})();
+// G3C4 버전 표시 — G3에서 제거, G1C10 디버그 패널로 이동
+// (하단 패널의 buildDebugMsg 안에 버전 포함)
 
 // ===== G1C10 사용폰트 디버그 패널 토글 =====
 (function() {
@@ -4028,7 +4226,7 @@ updateG7Conv10();
       b.addEventListener("click", () => {
         const text = txt.innerText;
         if (navigator.clipboard && window.isSecureContext) {
-          navigator.clipboard.writeText(text)
+          copyToClipboard(text)
             .then(() => { b.textContent = "✓완료"; setTimeout(() => b.textContent = "복사", 1500); })
             .catch(() => fallbackCopy(text, b));
         } else {
@@ -4057,9 +4255,14 @@ updateG7Conv10();
     const g6El = document.getElementById("ganjiGrid");
     const g6H = g6El ? g6El.getBoundingClientRect().height : 0;
     const g6W = g6El ? g6El.getBoundingClientRect().width : 0;
+    const version = getComputedStyle(document.documentElement)
+      .getPropertyValue("--version")
+      .replace(/"/g, "")
+      .trim();
     return `<b>폰트</b> &nbsp;<b><a href="https://github.com/naver/d2codingfont/releases/download/VER1.3.2/D2Coding-Ver1.3.2-20180524.zip" style="color:#4fc3f7;text-decoration:underline;" target="_blank">${font1}</a></b> &nbsp;|&nbsp; <b>${font2}</b>`
          + `<br><b>화면</b> &nbsp;<b style="color:#4fc3f7;">W${w} H${h}</b>`
-         + `&nbsp;&nbsp;|&nbsp;&nbsp;<b>G6</b> &nbsp;<b style="color:#a5d6a7;">W${Math.round(g6W)} H${Math.round(g6H)}</b>`;
+         + `&nbsp;&nbsp;|&nbsp;&nbsp;<b>G6</b> &nbsp;<b style="color:#a5d6a7;">W${Math.round(g6W)} H${Math.round(g6H)}</b>`
+         + `&nbsp;&nbsp;|&nbsp;&nbsp;<b style="color:#5B5C5E;">Ver</b> &nbsp;<b style="color:#5B5C5E;">${version}</b>`;
   }
 
   // 초기 표시
